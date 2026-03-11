@@ -57,11 +57,10 @@ export default function HeroSection() {
             {/* Social proof */}
             <div className="flex items-center gap-6 flex-wrap">
               <div className="flex -space-x-3">
-            {["bg-primary", "bg-gold", "bg-primary-glow", "bg-secondary"].map((c, i) => (
-                  <div key={i} className={`w-9 h-9 rounded-full border-2 border-dark-bg ${c} flex items-center justify-center text-xs font-bold font-body text-primary-foreground`}>
-                    {["A", "R", "S", "P"][i]}
-                  </div>
-                ))}
+                <div className="w-9 h-9 rounded-full border-2 border-dark-bg bg-primary flex items-center justify-center text-xs font-bold font-body text-primary-foreground">A</div>
+                <div className="w-9 h-9 rounded-full border-2 border-dark-bg bg-gold flex items-center justify-center text-xs font-bold font-body text-foreground">R</div>
+                <div className="w-9 h-9 rounded-full border-2 border-dark-bg bg-primary-glow flex items-center justify-center text-xs font-bold font-body text-primary-foreground">S</div>
+                <div className="w-9 h-9 rounded-full border-2 border-dark-bg bg-secondary flex items-center justify-center text-xs font-bold font-body text-secondary-foreground">P</div>
               </div>
               <div>
                 <div className="flex items-center gap-1 mb-1">
