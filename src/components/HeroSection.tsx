@@ -1,8 +1,10 @@
 import heroImage from "@/assets/hero-tryon.jpg";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ChevronRight, Star } from "lucide-react";
+import { Sparkles, ChevronRight, Star, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-dark-bg">
       {/* Background gradient orbs */}
@@ -45,12 +47,11 @@ export default function HeroSection() {
 
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 mb-12">
-              <Button variant="default" size="lg" className="bg-gradient-hero text-white font-semibold px-8 py-6 text-base rounded-full shadow-brand hover:scale-105 transition-transform animate-pulse-glow border-0">
-                Try It Free
-                <ChevronRight className="w-5 h-5 ml-1" />
+              <Button onClick={() => navigate("/try-on")} variant="default" size="lg" className="bg-gradient-hero text-white font-semibold px-8 py-6 text-base rounded-full shadow-brand hover:scale-105 transition-transform animate-pulse-glow border-0">
+                <Upload className="w-5 h-5 mr-2" /> Start Virtual Try-On
               </Button>
-              <Button variant="outline" size="lg" className="border-white/20 text-white bg-transparent hover:bg-white/10 px-8 py-6 text-base rounded-full transition-all">
-                Watch Demo
+              <Button onClick={() => navigate("/products")} variant="outline" size="lg" className="border-white/20 text-white bg-transparent hover:bg-white/10 px-8 py-6 text-base rounded-full transition-all">
+                Browse Products
               </Button>
             </div>
 
