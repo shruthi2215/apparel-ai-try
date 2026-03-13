@@ -4,6 +4,7 @@ import { Sparkles, ChevronRight, Star, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-dark-bg">
       {/* Background gradient orbs */}
