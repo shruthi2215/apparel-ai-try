@@ -141,18 +141,25 @@ export default function ProductsPage() {
                       <span className="font-body text-xs line-through text-muted-foreground">₹{product.original_price.toLocaleString()}</span>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <Button
+                    onClick={() => handleTryOn(product.id)}
+                    className="w-full h-9 text-xs bg-gradient-hero text-white border-0 rounded-lg font-body font-semibold hover:scale-105 transition-transform shadow-brand"
+                  >
+                    <Sparkles className="w-3 h-3 mr-1.5" /> Try On Me
+                  </Button>
+                  <div className="flex gap-2 mt-1.5">
                     <Button
-                      onClick={() => handleTryOn(product.id)}
-                      className="flex-1 h-8 text-xs bg-gradient-hero text-white border-0 rounded-lg font-body font-semibold hover:scale-105 transition-transform"
+                      variant="outline"
+                      className="flex-1 h-7 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
                     >
-                      <Sparkles className="w-3 h-3 mr-1" /> Try On
+                      <ShoppingCart className="w-3 h-3 mr-1" /> Cart
                     </Button>
                     <Button
                       variant="outline"
-                      className="h-8 w-8 p-0 rounded-lg border-white/10 text-muted-foreground hover:text-foreground"
+                      className="h-7 px-3 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
+                      onClick={() => handleTryOn(product.id)}
                     >
-                      <ShoppingCart className="w-3 h-3" />
+                      Buy Now
                     </Button>
                   </div>
                 </div>
