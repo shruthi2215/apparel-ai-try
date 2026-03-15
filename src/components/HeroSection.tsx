@@ -1,6 +1,6 @@
 import heroImage from "@/assets/hero-tryon.jpg";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ChevronRight, Star, Upload } from "lucide-react";
+import { Sparkles, ChevronRight, Star, Upload, Camera } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
