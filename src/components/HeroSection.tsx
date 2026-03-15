@@ -48,10 +48,10 @@ export default function HeroSection() {
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 mb-12">
               <Button onClick={() => navigate("/try-on")} variant="default" size="lg" className="bg-gradient-hero text-white font-semibold px-8 py-6 text-base rounded-full shadow-brand hover:scale-105 transition-transform animate-pulse-glow border-0">
-                <Upload className="w-5 h-5 mr-2" /> Start Virtual Try-On
+                <Upload className="w-5 h-5 mr-2" /> Try On Me
               </Button>
               <Button onClick={() => navigate("/products")} variant="outline" size="lg" className="border-white/20 text-white bg-transparent hover:bg-white/10 px-8 py-6 text-base rounded-full transition-all">
-                Browse Products
+                Browse Products <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
 
