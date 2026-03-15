@@ -2,3 +2,9 @@ project_id = "vonppkdllfzztpibtewy"
 
 [functions.ai-tryon-analysis]
 verify_jwt = false
+
+[functions.ai-tryon-image]
+verify_jwt = false
+
+[functions.ai-fashion-chat]
+verify_jwt = false
