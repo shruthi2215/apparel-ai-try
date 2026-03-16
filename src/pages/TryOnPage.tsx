@@ -349,7 +349,7 @@ export default function TryOnPage() {
         await supabase.from("try_on_sessions").insert({
           user_id: currentUser.id,
           ai_suggestions: analysisResult.status === "fulfilled" ? analysisResult.value.colorSuggestions : [],
-          ai_analysis: analysisResult.status === "fulfilled" ? (analysisResult.value as object) : {},
+          ai_analysis: analysisResult.status === "fulfilled" ? (analysisResult.value as Record<string, unknown>) : {},
           status: "completed",
         });
       }
