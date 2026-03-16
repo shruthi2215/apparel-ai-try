@@ -346,12 +346,13 @@ export default function TryOnPage() {
     try {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (currentUser) {
-        await supabase.from("try_on_sessions").insert({
+        const analysisData = analysisResult.status === "fulfilled" ? analysisResult.value : null;
+        await supabase.from("try_on_sessions").insert([{
           user_id: currentUser.id,
-          ai_suggestions: analysisResult.status === "fulfilled" ? analysisResult.value.colorSuggestions : [],
-          ai_analysis: analysisResult.status === "fulfilled" ? (analysisResult.value as Record<string, unknown>) : {},
+          ai_suggestions: analysisData?.colorSuggestions ?? [],
+          ai_analysis: analysisData ? JSON.parse(JSON.stringify(analysisData)) : {},
           status: "completed",
-        });
+        }]);
       }
     } catch {}
   };
