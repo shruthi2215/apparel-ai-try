@@ -31,7 +31,7 @@ function buildFallbackAnalysis(productName: string) {
   };
 }
 
-
+serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
@@ -48,6 +48,9 @@ function buildFallbackAnalysis(productName: string) {
       "skinTone": "descriptive warm/cool/neutral tone name",
       "bodyShape": "body shape type (Hourglass/Rectangle/Pear/Apple/Triangle)",
       "bestFit": "recommended fit description",
+      "fitScore": 90,
+      "recommendedSize": "M",
+      "recommendedColors": ["color1", "color2", "color3", "color4"],
       "colorSuggestions": ["suggestion 1", "suggestion 2", "suggestion 3"],
       "outfitTips": ["tip 1 specific to ${productName}", "tip 2", "tip 3"],
       "productRecommendations": ["similar product 1", "similar product 2", "similar product 3"]
@@ -73,8 +76,7 @@ function buildFallbackAnalysis(productName: string) {
     if (!response.ok) {
       // For 402 (credits exhausted) or 429 (rate limit), fall back to smart mock analysis
       if (response.status === 402 || response.status === 429) {
-        const fallback = buildFallbackAnalysis(productName);
-        return new Response(JSON.stringify({ analysis: fallback }), {
+        return new Response(JSON.stringify({ analysis: buildFallbackAnalysis(productName) }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
@@ -88,26 +90,7 @@ function buildFallbackAnalysis(productName: string) {
     try {
       analysis = JSON.parse(content);
     } catch {
-      analysis = {
-        skinTone: "Warm Medium",
-        bodyShape: "Hourglass",
-        bestFit: "Regular / Semi-fitted",
-        colorSuggestions: [
-          "Earth tones like terracotta and rust complement warm Indian skin tones beautifully.",
-          "Deep jewel tones — burgundy, emerald, navy — give a rich, vibrant look.",
-          "Avoid cool pastels which can wash out warm undertones."
-        ],
-        outfitTips: [
-          `${productName} is an excellent choice — the silhouette flatters most Indian body types.`,
-          "Pair with statement earrings and minimal makeup for a balanced look.",
-          "A fitted dupatta or stole can add elegance and dimension."
-        ],
-        productRecommendations: [
-          "Printed palazzo with similar embroidery",
-          "Contrast dupatta in complementary shade",
-          "Ethnic block-print kurti in warm tones"
-        ]
-      };
+      analysis = buildFallbackAnalysis(productName);
     }
 
     return new Response(JSON.stringify({ analysis }), {
