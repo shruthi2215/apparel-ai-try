@@ -173,6 +173,58 @@ function getSuggestions(current: typeof SAMPLE_PRODUCTS[0]) {
   return [...sameCategory, ...sharedTag, ...rest].slice(0, 8);
 }
 
+// ─── Canvas-based try-on compositing (fallback when AI unavailable) ───────────
+function compositeCanvasTryOn(userSrc: string, clothingSrc: string): Promise<string> {
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { resolve(userSrc); return; }
+
+    const userImg = new Image();
+    userImg.onload = () => {
+      // Use fixed portrait size for consistent output
+      const W = userImg.naturalWidth || 480;
+      const H = userImg.naturalHeight || 640;
+      canvas.width = W;
+      canvas.height = H;
+
+      // Draw full user photo as base layer
+      ctx.drawImage(userImg, 0, 0, W, H);
+
+      const clothingImg = new Image();
+      clothingImg.crossOrigin = "anonymous";
+      clothingImg.onload = () => {
+        // Place clothing over torso+legs region
+        const cx = W * 0.08;
+        const cy = H * 0.16;
+        const cw = W * 0.84;
+        const ch = H * 0.74;
+
+        // Semi-transparent overlay so body shape still shows through
+        ctx.globalAlpha = 0.88;
+        ctx.drawImage(clothingImg, cx, cy, cw, ch);
+        ctx.globalAlpha = 1.0;
+
+        // Light vignette at top/bottom to blend naturally
+        const vigTop = ctx.createLinearGradient(0, 0, 0, H * 0.22);
+        vigTop.addColorStop(0, "rgba(0,0,0,0.35)");
+        vigTop.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = vigTop;
+        ctx.fillRect(0, 0, W, H * 0.22);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.92));
+      };
+      clothingImg.onerror = () => resolve(userSrc);
+      // Append cache-buster to avoid CORS cached failures
+      clothingImg.src = clothingSrc.includes("?")
+        ? clothingSrc + "&cb=" + Date.now()
+        : clothingSrc + "?cb=" + Date.now();
+    };
+    userImg.onerror = () => resolve(userSrc);
+    userImg.src = userSrc;
+  });
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function TryOnPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
