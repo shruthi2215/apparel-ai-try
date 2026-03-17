@@ -45,14 +45,11 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // For 402 (credits exhausted) or 429 (rate limit), fall back to smart mock analysis
+      if (response.status === 402 || response.status === 429) {
+        const fallback = buildFallbackAnalysis(productName);
+        return new Response(JSON.stringify({ analysis: fallback }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       throw new Error(`AI gateway error: ${response.status}`);
