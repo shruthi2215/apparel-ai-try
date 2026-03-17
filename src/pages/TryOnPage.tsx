@@ -357,13 +357,20 @@ export default function TryOnPage() {
         userPhotoMimeType: userPhotoFile?.type || "image/jpeg",
       },
     });
-    if (error || data?.error) throw new Error(data?.error || error?.message);
-    if (data?.fallback) {
+
+    // Hard error from the function itself (network / deploy issue)
+    if (error) throw new Error(error?.message);
+
+    // AI credits exhausted or rate-limited → composite clothing onto user photo client-side
+    if (data?.fallback || data?.error) {
       toast({
-        title: "Demo Mode",
-        description: "AI image generation is temporarily unavailable. Showing your original photo with style analysis.",
+        title: "✨ Visual Try-On Mode",
+        description: `AI generation is in demo mode — applying ${product.name} overlay on your photo.`,
       });
+      // compositeCanvasTryOn overlays the clothing image onto the user's uploaded photo
+      return compositeCanvasTryOn(userPhoto!, product.image_url);
     }
+
     return data.imageUrl;
   };
 
