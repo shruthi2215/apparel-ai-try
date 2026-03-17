@@ -306,6 +306,12 @@ export default function TryOnPage() {
       },
     });
     if (error || data?.error) throw new Error(data?.error || error?.message);
+    if (data?.fallback) {
+      toast({
+        title: "Demo Mode",
+        description: "AI image generation is temporarily unavailable. Showing your original photo with style analysis.",
+      });
+    }
     return data.imageUrl;
   };
 
