@@ -53,11 +53,11 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="relative">
+          <div className="relative">
           {/* Connector line */}
-          <div className="hidden lg:block absolute top-20 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          <div className="hidden lg:block absolute top-16 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {steps.map((step, i) => (
               <div
                 key={i}
@@ -65,23 +65,23 @@ export default function HowItWorks() {
                 style={{ animationDelay: `${i * 0.15}s` }}
               >
                 {/* Card */}
-                <div className="bg-card rounded-3xl p-8 border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-brand hover:-translate-y-1 h-full">
+                <div className="bg-card rounded-2xl p-5 border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-brand hover:-translate-y-1 h-full">
                   {/* Number */}
-                  <div className="flex items-start justify-between mb-6">
-                    <div className={`w-14 h-14 rounded-2xl ${step.bg} flex items-center justify-center`}>
-                      <step.icon className={`w-7 h-7 ${step.color}`} />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-10 h-10 rounded-xl ${step.bg} flex items-center justify-center`}>
+                      <step.icon className={`w-5 h-5 ${step.color}`} />
                     </div>
-                    <span className="font-display text-5xl font-bold text-border">{step.number}</span>
+                    <span className="font-display text-4xl font-bold text-border">{step.number}</span>
                   </div>
 
-                  <h3 className="font-display text-2xl font-bold text-foreground mb-3">{step.title}</h3>
-                  <p className="font-body text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                  <h3 className="font-display text-xl font-bold text-foreground mb-2">{step.title}</h3>
+                  <p className="font-body text-muted-foreground text-xs leading-relaxed">{step.description}</p>
                 </div>
 
                 {/* Arrow between steps */}
                 {i < steps.length - 1 && (
-                  <div className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-secondary items-center justify-center border border-border">
-                    <span className="text-muted-foreground text-xs">→</span>
+                  <div className="hidden lg:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 rounded-full bg-secondary items-center justify-center border border-border">
+                    <span className="text-muted-foreground text-[10px]">→</span>
                   </div>
                 )}
               </div>
