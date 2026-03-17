@@ -60,26 +60,25 @@ export default function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((feat, i) => (
             <div
               key={i}
-              className="group glass-card rounded-3xl p-8 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 cursor-default"
+              className="group glass-card rounded-2xl p-5 hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 cursor-default"
             >
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-                  <feat.icon className="w-7 h-7 text-primary group-hover:text-primary-glow transition-colors" />
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                  <feat.icon className="w-5 h-5 text-primary group-hover:text-primary-glow transition-colors" />
                 </div>
-                <span className="px-3 py-1 rounded-full bg-gold/15 text-gold text-xs font-body font-semibold tracking-wide">
+                <span className="px-2.5 py-0.5 rounded-full bg-gold/15 text-gold text-xs font-body font-semibold tracking-wide">
                   {feat.tag}
                 </span>
               </div>
 
-              <h3 className="font-display text-2xl font-bold text-white mb-3">{feat.title}</h3>
-              <p className="font-body text-white/50 text-sm leading-relaxed">{feat.description}</p>
+              <h3 className="font-display text-lg font-bold text-white mb-1.5">{feat.title}</h3>
+              <p className="font-body text-white/50 text-xs leading-relaxed">{feat.description}</p>
 
-              {/* Subtle border glow on hover */}
-              <div className="mt-6 h-px bg-gradient-to-r from-transparent via-primary/0 to-transparent group-hover:via-primary/40 transition-all duration-500" />
+              <div className="mt-4 h-px bg-gradient-to-r from-transparent via-primary/0 to-transparent group-hover:via-primary/40 transition-all duration-500" />
             </div>
           ))}
         </div>
