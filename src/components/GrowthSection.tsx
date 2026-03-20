@@ -6,59 +6,56 @@ const roadmap = [
   {
     phase: "6 Months",
     icon: TrendingUp,
-    color: "text-primary",
-    bg: "bg-primary/15",
+    iconBg: "bg-primary/10",
+    iconColor: "text-primary",
     items: ["Launch MVP", "Partner with 20 brands", "Reach 50k users"],
   },
   {
     phase: "1 Year",
     icon: Users,
-    color: "text-gold",
-    bg: "bg-gold/15",
+    iconBg: "bg-gold/12",
+    iconColor: "text-gold-dark",
     items: ["200k active users", "100+ fashion brands", "Expand across India"],
   },
   {
     phase: "3 Years",
     icon: Globe,
-    color: "text-primary-glow",
-    bg: "bg-primary-glow/15",
+    iconBg: "bg-accent/18",
+    iconColor: "text-accent-foreground",
     items: ["5M+ users", "Global partnerships", "Full AI fashion ecosystem"],
   },
 ];
 
 export default function GrowthSection() {
   return (
-    <section className="py-28 bg-background relative overflow-hidden">
-      <div className="absolute top-1/2 right-0 w-80 h-80 rounded-full bg-gold/10 blur-3xl" />
+    <section className="py-24 bg-background relative overflow-hidden">
+      <div className="absolute top-1/2 right-0 w-72 h-72 rounded-full bg-gold/6 blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4">
         {/* Growth Roadmap */}
-        <div className="text-center mb-20">
-          <span className="inline-block text-sm font-body font-semibold tracking-[0.2em] uppercase text-primary mb-4">
-            Growth Roadmap
-          </span>
-          <h2 className="font-display text-5xl lg:text-6xl font-bold text-foreground mb-6">
+        <div className="text-center mb-14">
+          <span className="pill-lavender mb-5 inline-flex">Growth Roadmap</span>
+          <h2 className="font-display text-4xl lg:text-5xl font-medium text-foreground mb-4 text-balance">
             From Launch to<br />
             <span className="gradient-text">5 Million Users</span>
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-28">
+        <div className="grid md:grid-cols-3 gap-5 mb-24">
           {roadmap.map((phase, i) => (
             <div key={i} className="relative">
-              {/* Connector */}
               {i < roadmap.length - 1 && (
-                <div className="hidden md:block absolute top-10 -right-4 z-10 text-muted-foreground">→</div>
+                <div className="hidden md:block absolute top-9 -right-3 z-10 text-muted-foreground text-sm">→</div>
               )}
-              <div className="bg-card rounded-3xl p-8 border border-border hover:border-primary/30 transition-all hover:shadow-brand h-full">
-                <div className={`w-14 h-14 rounded-2xl ${phase.bg} flex items-center justify-center mb-6`}>
-                  <phase.icon className={`w-7 h-7 ${phase.color}`} />
+              <div className="bg-white rounded-[14px] p-6 border border-border hover:border-primary/20 transition-all hover:shadow-md h-full">
+                <div className={`w-12 h-12 rounded-xl ${phase.iconBg} flex items-center justify-center mb-5`}>
+                  <phase.icon className={`w-6 h-6 ${phase.iconColor}`} />
                 </div>
-                <h3 className="font-display text-2xl font-bold text-foreground mb-4">{phase.phase}</h3>
-                <ul className="space-y-3">
+                <h3 className="font-display text-xl font-semibold text-foreground mb-3">{phase.phase}</h3>
+                <ul className="space-y-2">
                   {phase.items.map((item, j) => (
-                    <li key={j} className="flex items-center gap-3 font-body text-muted-foreground text-sm">
-                      <span className={`w-1.5 h-1.5 rounded-full ${phase.color.replace("text-", "bg-")}`} />
+                    <li key={j} className="flex items-center gap-2.5 font-body text-muted-foreground text-sm">
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${phase.iconColor.replace("text-", "bg-")}`} />
                       {item}
                     </li>
                   ))}
@@ -68,29 +65,26 @@ export default function GrowthSection() {
           ))}
         </div>
 
-        {/* CTA Banner */}
-        <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0">
-            <img src={bodyScanImage} alt="AI body scan visualization" className="w-full h-full object-cover opacity-30" />
-            <div className="absolute inset-0 bg-gradient-hero opacity-90" />
+        {/* CTA Banner — soft overlay approach */}
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-soft border border-border shadow-soft">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-primary/12 blur-3xl" />
+            <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-accent/15 blur-3xl" />
           </div>
 
-          <div className="relative z-10 px-12 py-20 text-center">
-            <p className="font-body text-white/70 text-sm font-semibold tracking-[0.2em] uppercase mb-4">
-              Join the Revolution
-            </p>
-            <h2 className="font-display text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              India's Future of<br />Fashion is Here.
+          <div className="relative z-10 px-10 py-16 text-center">
+            <span className="pill-blush mb-5 inline-flex">Join the Revolution</span>
+            <h2 className="font-display text-4xl lg:text-5xl font-medium text-foreground mb-4 text-balance leading-tight">
+              India's Future of Fashion is Here.
             </h2>
-            <p className="font-body text-white/70 text-lg max-w-lg mx-auto mb-10">
+            <p className="font-body text-muted-foreground text-base max-w-lg mx-auto mb-8 text-pretty">
               Be among the first brands to offer AI virtual try-on. Boost conversions. Cut returns. Delight customers.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button className="bg-white text-primary font-body font-semibold px-8 py-6 text-base rounded-full hover:bg-gold hover:text-dark-bg transition-all shadow-lg">
-                Start Free Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
+            <div className="flex flex-wrap justify-center gap-3">
+              <Button className="bg-primary text-primary-foreground font-body font-medium px-7 h-11 text-sm rounded-full hover:bg-primary/90 transition-all shadow-soft border-0">
+                Start Free Trial <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button variant="outline" className="border-white/30 text-white bg-transparent hover:bg-white/15 px-8 py-6 text-base rounded-full">
+              <Button variant="outline" className="border-border text-foreground bg-white/70 hover:bg-white px-7 h-11 text-sm rounded-full font-body">
                 Book a Demo
               </Button>
             </div>

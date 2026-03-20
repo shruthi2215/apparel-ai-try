@@ -13,7 +13,7 @@ export default {
     extend: {
       fontFamily: {
         display: ["Cormorant Garamond", "serif"],
-        body: ["DM Sans", "sans-serif"],
+        body: ["Inter", "DM Sans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -60,6 +60,10 @@ export default {
           bg: "hsl(var(--dark-bg))",
           surface: "hsl(var(--dark-surface))",
         },
+        lavender: "hsl(var(--lavender))",
+        blush: "hsl(var(--blush))",
+        mint: "hsl(var(--mint))",
+        peach: "hsl(var(--peach))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

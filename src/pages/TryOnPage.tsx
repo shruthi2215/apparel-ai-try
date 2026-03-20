@@ -111,20 +111,20 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
 // ─── Loading Overlay ──────────────────────────────────────────────────────────
 function GeneratingOverlay() {
   return (
-    <div className="aspect-[3/4] rounded-2xl bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col items-center justify-center px-6">
-      <div className="relative mb-6">
-        <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-        <Sparkles className="absolute inset-0 m-auto w-7 h-7 text-primary animate-pulse" />
+    <div className="aspect-[3/4] rounded-[14px] bg-primary/4 border-2 border-dashed border-primary/15 flex flex-col items-center justify-center px-6">
+      <div className="relative mb-5">
+        <div className="w-14 h-14 rounded-full border-3 border-primary/15 border-t-primary animate-spin" style={{ borderWidth: "3px" }} />
+        <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-primary animate-pulse" />
       </div>
-      <p className="font-display text-lg font-semibold text-foreground text-center mb-2">
+      <p className="font-display text-lg font-medium text-foreground text-center mb-1.5">
         ✨ Creating Your Virtual Look…
       </p>
       <p className="font-body text-sm text-muted-foreground text-center">
         This may take 3–5 seconds
       </p>
-      <div className="flex gap-1 mt-5">
-        {[0, 150, 300].map((d) => (
-          <span key={d} className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: `${d}ms` }} />
+      <div className="flex gap-1.5 mt-4">
+        {[0, 120, 240].map((d) => (
+          <span key={d} className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: `${d}ms` }} />
         ))}
       </div>
     </div>
@@ -138,19 +138,19 @@ function SuggestionCard({
   return (
     <div
       onClick={onSelect}
-      className={`flex-shrink-0 w-28 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 border-2 hover:scale-105 ${
-        current ? "border-primary shadow-brand" : "border-transparent hover:border-white/30"
+      className={`flex-shrink-0 w-24 rounded-[14px] overflow-hidden cursor-pointer transition-all duration-200 border-2 hover:scale-[1.04] ${
+        current ? "border-primary shadow-soft" : "border-transparent hover:border-primary/30"
       }`}
     >
       <div className="relative">
         <img src={product.image_url} alt={product.name} className="w-full aspect-[3/4] object-cover" />
         {current && (
-          <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 text-white drop-shadow" />
+          <div className="absolute inset-0 bg-primary/15 flex items-center justify-center">
+            <CheckCircle className="w-5 h-5 text-primary drop-shadow" />
           </div>
         )}
       </div>
-      <div className="p-1.5 bg-background/80">
+      <div className="p-1.5 bg-white border-t border-border">
         <p className="font-body text-xs text-foreground font-medium leading-tight line-clamp-1">{product.name}</p>
         <p className="font-body text-xs text-primary font-semibold">₹{product.price.toLocaleString()}</p>
       </div>
@@ -490,115 +490,112 @@ export default function TryOnPage() {
       {/* Mobile FAB – chat */}
       <button
         onClick={() => setChatOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-hero shadow-brand flex items-center justify-center md:hidden"
+        className="fixed bottom-6 right-6 z-40 w-13 h-13 rounded-full bg-primary shadow-soft flex items-center justify-center md:hidden"
+        style={{ width: "3.25rem", height: "3.25rem" }}
       >
-        <MessageCircle className="w-6 h-6 text-white" />
+        <MessageCircle className="w-5 h-5 text-white" />
       </button>
 
-      <div className="pt-28 pb-20 px-4">
+      <div className="pt-24 pb-20 px-4">
         <div className="container mx-auto max-w-6xl">
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-4">
-              <Sparkles className="w-4 h-4 text-gold" />
-              <span className="font-body text-sm text-muted-foreground">AI-Powered Virtual Try-On</span>
+          <div className="text-center mb-7">
+            <div className="pill-blush mb-4 inline-flex">
+              <Sparkles className="w-3.5 h-3.5" />
+              AI-Powered Virtual Try-On
             </div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-3">
-              Virtual <span className="gradient-gold-text">Try-On</span>
+            <h1 className="font-display text-3xl md:text-4xl font-medium text-foreground mb-2.5 text-balance">
+              Virtual <span className="gradient-text">Try-On</span>
             </h1>
-            <p className="font-body text-muted-foreground text-lg">Upload your photo and see how any outfit looks on you — instantly</p>
+            <p className="font-body text-muted-foreground text-base text-pretty">Upload your photo and see how any outfit looks on you — instantly</p>
           </div>
 
           {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="flex items-center justify-center gap-2.5 mb-7">
             {[{ n: 1, label: "Upload Photo" }, { n: 2, label: "Select Outfit" }, { n: 3, label: "AI Try-On" }].map(({ n, label }, i) => (
-              <div key={n} className="flex items-center gap-3">
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-body text-sm font-semibold transition-all ${
-                  step === n ? "bg-gradient-hero text-white shadow-brand" :
-                  step > n ? "bg-primary/20 text-primary" : "glass-card text-muted-foreground"
+              <div key={n} className="flex items-center gap-2.5">
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-body text-sm font-medium transition-all ${
+                  step === n ? "bg-primary text-primary-foreground shadow-soft" :
+                  step > n ? "bg-primary/10 text-primary" : "bg-white border border-border text-muted-foreground"
                 }`}>
-                  {step > n ? <CheckCircle className="w-4 h-4" /> : <span>{n}</span>}
-                  <span className="hidden md:inline">{label}</span>
+                  {step > n ? <CheckCircle className="w-3.5 h-3.5" /> : <span className="text-xs">{n}</span>}
+                  <span className="hidden md:inline text-xs">{label}</span>
                 </div>
-                {i < 2 && <ArrowRight className="w-4 h-4 text-muted-foreground" />}
+                {i < 2 && <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/50" />}
               </div>
             ))}
           </div>
 
           {/* ── Step 1+2: Upload & Select ─────────────────────────────── */}
           {step !== 3 && (
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-5">
               {/* LEFT: Photo upload */}
-              <div className="glass-card rounded-3xl p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Camera className="w-5 h-5 text-primary" /> Your Photo
+              <div className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-primary" /> Your Photo
                 </h2>
 
                 {!userPhoto ? (
                   <>
-                    {/* Upload guidelines */}
-                    <div className="mb-4 p-3 rounded-xl bg-primary/5 border border-primary/10">
-                      <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                    <div className="mb-4 p-3 rounded-xl bg-primary/4 border border-primary/10">
+                      <p className="font-body text-xs text-muted-foreground leading-relaxed text-pretty">
                         📸 <strong className="text-foreground">Best results:</strong> Upload a clear front-facing full-body or half-body photo with good lighting. Plain background preferred.
                       </p>
                     </div>
 
-                    {/* Drag & Drop zone */}
                     <div
                       onDragOver={(e) => { e.preventDefault(); setDraggingFile(true); }}
                       onDragLeave={() => setDraggingFile(false)}
                       onDrop={handleDrop}
                       onClick={() => fileInputRef.current?.click()}
-                      className={`border-2 border-dashed rounded-2xl aspect-[3/4] flex flex-col items-center justify-center cursor-pointer transition-all group ${
-                        draggingFile ? "border-primary bg-primary/5 scale-[1.01]" : "border-white/20 hover:border-primary/50"
+                      className={`border-2 border-dashed rounded-[14px] aspect-[3/4] flex flex-col items-center justify-center cursor-pointer transition-all group ${
+                        draggingFile ? "border-primary bg-primary/4 scale-[1.01]" : "border-border hover:border-primary/40 hover:bg-primary/2"
                       }`}
                     >
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                        <Upload className="w-8 h-8 text-primary" />
+                      <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mb-3 group-hover:bg-primary/14 transition-colors">
+                        <Upload className="w-7 h-7 text-primary" />
                       </div>
-                      <p className="font-body font-semibold text-foreground mb-1">Drag & drop or click to upload</p>
-                      <p className="font-body text-sm text-muted-foreground text-center px-4">JPG / PNG / HEIC · Max 10MB</p>
+                      <p className="font-body font-medium text-foreground text-sm mb-1">Drag & drop or click to upload</p>
+                      <p className="font-body text-xs text-muted-foreground text-center px-4">JPG / PNG / HEIC · Max 10MB</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mt-4">
-                      <Button onClick={() => fileInputRef.current?.click()} className="h-11 bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold hover:scale-105 transition-transform">
+                      <Button onClick={() => fileInputRef.current?.click()} className="h-10 bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-sm hover:bg-primary/90 transition-all">
                         <Upload className="w-4 h-4 mr-2" /> Gallery
                       </Button>
-                      <Button onClick={() => cameraInputRef.current?.click()} variant="outline" className="h-11 rounded-xl border-white/10 text-foreground font-body font-semibold hover:bg-white/5">
+                      <Button onClick={() => cameraInputRef.current?.click()} variant="outline" className="h-10 rounded-xl border-border text-foreground font-body font-medium text-sm hover:bg-muted/50">
                         <Camera className="w-4 h-4 mr-2" /> Camera
                       </Button>
                     </div>
                   </>
                 ) : (
                   <>
-                    {/* Photo preview with re-upload / remove */}
-                    <div className="relative rounded-2xl overflow-hidden aspect-[3/4]">
+                    <div className="relative rounded-[14px] overflow-hidden aspect-[3/4]">
                       <img src={userPhoto} alt="Your photo" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <div className="glass-card rounded-xl p-2.5 flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                          <p className="font-body text-xs text-white font-semibold">✔ Photo Ready — select an outfit!</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2.5 flex items-center gap-2 border border-border">
+                          <CheckCircle className="w-3.5 h-3.5 text-accent-foreground flex-shrink-0" />
+                          <p className="font-body text-xs text-foreground font-medium">Photo Ready — select an outfit!</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Re-upload / Remove buttons */}
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       <Button
                         onClick={() => reuploadInputRef.current?.click()}
                         variant="outline"
-                        className="h-11 rounded-xl border-primary/30 text-primary hover:bg-primary/5 font-body font-semibold"
+                        className="h-10 rounded-xl border-primary/25 text-primary hover:bg-primary/5 font-body font-medium text-sm"
                       >
-                        <RotateCcw className="w-4 h-4 mr-2" /> Re-upload Photo
+                        <RotateCcw className="w-3.5 h-3.5 mr-2" /> Re-upload
                       </Button>
                       <Button
                         onClick={removePhoto}
                         variant="outline"
-                        className="h-11 rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 font-body font-semibold"
+                        className="h-10 rounded-xl border-destructive/25 text-destructive hover:bg-destructive/5 font-body font-medium text-sm"
                       >
-                        <Trash2 className="w-4 h-4 mr-2" /> Remove Photo
+                        <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove
                       </Button>
                     </div>
                   </>
@@ -608,10 +605,9 @@ export default function TryOnPage() {
                 <input ref={reuploadInputRef} type="file" accept="image/*" className="hidden" onChange={handleReuploadInput} />
                 <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileInput} />
 
-                {/* Privacy note */}
                 <div className="mt-4 flex items-start gap-2">
-                  <Shield className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <p className="font-body text-xs text-muted-foreground">
+                  <Shield className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <p className="font-body text-xs text-muted-foreground text-pretty">
                     Your image is used only for virtual try-on processing and is not stored permanently.
                   </p>
                 </div>
@@ -627,24 +623,24 @@ export default function TryOnPage() {
               </div>
 
               {/* RIGHT: Product selection */}
-              <div className="glass-card rounded-3xl p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" /> Select Outfit
+              <div className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" /> Select Outfit
                 </h2>
 
-                <div className="grid grid-cols-3 gap-2.5 mb-4 max-h-72 overflow-y-auto pr-1">
+                <div className="grid grid-cols-3 gap-2 mb-4 max-h-64 overflow-y-auto pr-1">
                   {SAMPLE_PRODUCTS.map((product) => (
                     <div
                       key={product.id}
                       onClick={() => handleSelectProduct(product)}
-                      className={`rounded-xl overflow-hidden cursor-pointer transition-all border-2 ${
+                      className={`rounded-[14px] overflow-hidden cursor-pointer transition-all border-2 ${
                         selectedProduct?.id === product.id
-                          ? "border-primary shadow-brand scale-[1.03]"
-                          : "border-transparent hover:border-white/20"
+                          ? "border-primary shadow-soft scale-[1.03]"
+                          : "border-transparent hover:border-primary/25"
                       }`}
                     >
                       <img src={product.image_url} alt={product.name} className="w-full aspect-[3/4] object-cover" />
-                      <div className="p-1.5">
+                      <div className="p-1.5 bg-muted/30">
                         <p className="font-body text-xs text-foreground font-medium leading-tight line-clamp-1">{product.name}</p>
                         <p className="font-body text-xs text-primary font-semibold">₹{product.price.toLocaleString()}</p>
                       </div>
@@ -652,18 +648,17 @@ export default function TryOnPage() {
                   ))}
                 </div>
 
-                {/* Color & Size selectors */}
                 {selectedProduct && (
-                  <div className="space-y-3 mb-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="space-y-3 mb-4 p-3 rounded-xl bg-muted/30 border border-border">
                     <div>
-                      <p className="font-body text-xs text-muted-foreground mb-2 font-semibold uppercase tracking-wide">Color</p>
+                      <p className="font-body text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Color</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedProduct.colors.map(c => (
                           <button
                             key={c}
                             onClick={() => setSelectedColor(c)}
                             title={c}
-                            className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c ? "border-foreground scale-110 shadow-md" : "border-transparent"}`}
+                            className={`w-6 h-6 rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c ? "border-foreground scale-110 shadow-sm" : "border-transparent"}`}
                             style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }}
                           />
                         ))}
@@ -671,16 +666,16 @@ export default function TryOnPage() {
                       {selectedColor && <p className="font-body text-xs text-muted-foreground mt-1">{selectedColor}</p>}
                     </div>
                     <div>
-                      <p className="font-body text-xs text-muted-foreground mb-2 font-semibold uppercase tracking-wide">Size</p>
+                      <p className="font-body text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Size</p>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedProduct.sizes.map(s => (
                           <button
                             key={s}
                             onClick={() => setSelectedSize(s)}
-                            className={`px-3 py-1 rounded-lg font-body text-xs font-semibold transition-all border ${
+                            className={`px-2.5 py-1 rounded-lg font-body text-xs font-medium transition-all border ${
                               selectedSize === s
                                 ? "bg-primary text-primary-foreground border-primary"
-                                : "border-white/10 text-muted-foreground hover:text-foreground hover:border-white/30"
+                                : "border-border text-muted-foreground hover:text-foreground hover:border-primary/25"
                             }`}
                           >
                             {s}
@@ -694,7 +689,7 @@ export default function TryOnPage() {
                 <Button
                   onClick={runFullAnalysis}
                   disabled={!userPhoto || !selectedProduct || analyzing}
-                  className="w-full h-12 bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold hover:scale-105 transition-transform shadow-brand disabled:opacity-50 disabled:scale-100"
+                  className="w-full h-11 bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-sm hover:bg-primary/90 transition-all shadow-soft disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {analyzing ? (
                     <span className="flex items-center gap-2">
@@ -715,44 +710,42 @@ export default function TryOnPage() {
 
           {/* ── Step 3: Results ───────────────────────────────────────── */}
           {step === 3 && (
-            <div className="space-y-6">
-              <div className="grid lg:grid-cols-5 gap-6">
+            <div className="space-y-5">
+              <div className="grid lg:grid-cols-5 gap-5">
                 {/* LEFT: Try-On Image (3 cols) */}
                 <div className="lg:col-span-3 space-y-4">
-                  <div className="glass-card rounded-3xl p-5">
+                  <div className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
                     {/* Result tabs */}
                     <div className="flex gap-2 mb-4">
                       <button
                         onClick={() => setActiveResultTab("tryon")}
-                        className={`flex-1 py-2 rounded-xl font-body text-sm font-semibold transition-all ${activeResultTab === "tryon" ? "bg-gradient-hero text-white" : "glass-card text-muted-foreground hover:text-foreground"}`}
+                        className={`flex-1 py-2 rounded-xl font-body text-xs font-medium transition-all border ${activeResultTab === "tryon" ? "bg-primary text-primary-foreground border-primary shadow-soft" : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"}`}
                       >
-                        <Eye className="w-4 h-4 inline mr-1.5" />Try-On View
+                        <Eye className="w-3.5 h-3.5 inline mr-1.5" />Try-On View
                       </button>
                       <button
                         onClick={() => setActiveResultTab("analysis")}
-                        className={`flex-1 py-2 rounded-xl font-body text-sm font-semibold transition-all ${activeResultTab === "analysis" ? "bg-gradient-hero text-white" : "glass-card text-muted-foreground hover:text-foreground"}`}
+                        className={`flex-1 py-2 rounded-xl font-body text-xs font-medium transition-all border ${activeResultTab === "analysis" ? "bg-primary text-primary-foreground border-primary shadow-soft" : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"}`}
                       >
-                        <Sparkles className="w-4 h-4 inline mr-1.5" />AI Analysis
+                        <Sparkles className="w-3.5 h-3.5 inline mr-1.5" />AI Analysis
                       </button>
                     </div>
 
                     {activeResultTab === "tryon" && (
                       <>
-                        {/* Image area */}
                         {analyzing || generatingImage ? (
                           <GeneratingOverlay />
                         ) : tryOnImage && userPhoto ? (
                           <BeforeAfterSlider before={userPhoto} after={tryOnImage} />
                         ) : (
-                          <div className="aspect-[3/4] rounded-2xl overflow-hidden">
+                          <div className="aspect-[3/4] rounded-[14px] overflow-hidden">
                             <img src={userPhoto!} alt="Original" className="w-full h-full object-cover" />
                           </div>
                         )}
 
-                        {/* Color variant switcher */}
                         {selectedProduct && !analyzing && (
                           <div className="mt-4">
-                            <p className="font-body text-xs text-muted-foreground mb-2 font-semibold">Try other colors</p>
+                            <p className="font-body text-xs text-muted-foreground mb-2 font-medium">Try other colors</p>
                             <div className="flex gap-2 flex-wrap">
                               {selectedProduct.colors.map(c => (
                                 <button
@@ -760,7 +753,7 @@ export default function TryOnPage() {
                                   onClick={() => switchColor(c)}
                                   title={c}
                                   disabled={generatingImage}
-                                  className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 disabled:opacity-50 ${selectedColor === c ? "border-foreground scale-110 shadow-md" : "border-transparent"}`}
+                                  className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 disabled:opacity-50 ${selectedColor === c ? "border-foreground scale-110 shadow-sm" : "border-transparent"}`}
                                   style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }}
                                 />
                               ))}
@@ -768,26 +761,27 @@ export default function TryOnPage() {
                           </div>
                         )}
 
-                        {/* Download & Share row */}
                         {tryOnImage && !analyzing && (
                           <div className="mt-4 flex gap-2 flex-wrap">
                             <button
                               onClick={downloadLook}
-                              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-foreground text-xs font-body font-semibold hover:bg-white/10 transition-colors"
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-muted/50 border border-border text-foreground text-xs font-body font-medium hover:bg-muted transition-colors"
                             >
-                              <Download className="w-3.5 h-3.5" /> Download Look
+                              <Download className="w-3.5 h-3.5" /> Download
                             </button>
                             <button
                               onClick={shareOnWhatsApp}
-                              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-green-500/15 border border-green-500/20 text-green-400 text-xs font-body font-semibold hover:bg-green-500/25 transition-colors"
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                              style={{ background: "hsl(142 60% 96%)", borderColor: "hsl(142 40% 85%)", color: "hsl(142 50% 30%)" }}
                             >
-                              Share WhatsApp
+                              WhatsApp
                             </button>
                             <button
                               onClick={shareOnFacebook}
-                              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-500/15 border border-blue-500/20 text-blue-400 text-xs font-body font-semibold hover:bg-blue-500/25 transition-colors"
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                              style={{ background: "hsl(220 60% 96%)", borderColor: "hsl(220 40% 85%)", color: "hsl(220 50% 35%)" }}
                             >
-                              Share Facebook
+                              Facebook
                             </button>
                           </div>
                         )}
@@ -795,41 +789,41 @@ export default function TryOnPage() {
                     )}
 
                     {activeResultTab === "analysis" && analysis && (
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-primary/10 rounded-xl p-3">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Palette className="w-4 h-4 text-primary" />
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div className="bg-primary/6 rounded-xl p-3">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <Palette className="w-3.5 h-3.5 text-primary" />
                               <span className="font-body text-xs text-muted-foreground">Skin Tone</span>
                             </div>
-                            <p className="font-body text-sm font-semibold text-foreground">{analysis.skinTone}</p>
+                            <p className="font-body text-sm font-medium text-foreground">{analysis.skinTone}</p>
                           </div>
-                          <div className="bg-primary/10 rounded-xl p-3">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Ruler className="w-4 h-4 text-primary" />
+                          <div className="bg-primary/6 rounded-xl p-3">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <Ruler className="w-3.5 h-3.5 text-primary" />
                               <span className="font-body text-xs text-muted-foreground">Body Shape</span>
                             </div>
-                            <p className="font-body text-sm font-semibold text-foreground">{analysis.bodyShape}</p>
+                            <p className="font-body text-sm font-medium text-foreground">{analysis.bodyShape}</p>
                           </div>
                         </div>
 
                         {analysis.recommendedSize && (
-                          <div className="bg-gold/10 border border-gold/20 rounded-xl p-4">
+                          <div className="bg-gold/8 border border-gold/20 rounded-xl p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <p className="font-body text-xs text-gold font-semibold uppercase tracking-wide">Recommended Size</p>
-                              <span className="font-display text-2xl font-bold text-foreground">{analysis.recommendedSize}</span>
+                              <p className="font-body text-xs text-gold-dark font-medium uppercase tracking-wide">Recommended Size</p>
+                              <span className="font-display text-xl font-semibold text-foreground">{analysis.recommendedSize}</span>
                             </div>
                             {analysis.fitScore && (
                               <div>
-                                <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center justify-between mb-1.5">
                                   <p className="font-body text-xs text-muted-foreground">Fit Score</p>
-                                  <p className="font-body text-xs font-semibold text-foreground">{analysis.fitScore}% match</p>
+                                  <p className="font-body text-xs font-medium text-foreground">{analysis.fitScore}% match</p>
                                 </div>
-                                <div className="h-2 rounded-full bg-white/10">
-                                  <div className="h-full rounded-full bg-gradient-hero" style={{ width: `${analysis.fitScore}%` }} />
+                                <div className="h-1.5 rounded-full bg-border">
+                                  <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${analysis.fitScore}%` }} />
                                 </div>
                                 <div className="flex justify-between mt-1">
-                                  {["Tight Fit", "Perfect Fit", "Loose Fit"].map(f => (
+                                  {["Tight", "Perfect", "Loose"].map(f => (
                                     <span key={f} className="font-body text-xs text-muted-foreground">{f}</span>
                                   ))}
                                 </div>
@@ -838,20 +832,20 @@ export default function TryOnPage() {
                           </div>
                         )}
 
-                        <div className="bg-primary/5 border border-primary/10 rounded-xl p-3">
-                          <p className="font-body text-xs text-primary font-semibold mb-1">✨ Best Fit</p>
-                          <p className="font-body text-sm text-foreground">{analysis.bestFit}</p>
+                        <div className="bg-secondary/60 border border-secondary rounded-xl p-3">
+                          <p className="font-body text-xs text-primary font-medium mb-1">✨ Best Fit</p>
+                          <p className="font-body text-sm text-foreground text-pretty">{analysis.bestFit}</p>
                         </div>
 
                         <div>
-                          <p className="font-body text-sm font-semibold text-foreground mb-2 flex items-center gap-1">
-                            <Palette className="w-4 h-4 text-primary" /> Color Suggestions
+                          <p className="font-body text-xs font-medium text-foreground mb-2 flex items-center gap-1">
+                            <Palette className="w-3.5 h-3.5 text-primary" /> Color Suggestions
                           </p>
-                          <div className="space-y-2">
+                          <div className="space-y-1.5">
                             {analysis.colorSuggestions.map((s, i) => (
                               <div key={i} className="flex items-start gap-2">
-                                <span className="text-primary mt-0.5">→</span>
-                                <span className="font-body text-xs text-foreground/80 leading-relaxed">{s}</span>
+                                <span className="text-primary mt-0.5 text-xs">→</span>
+                                <span className="font-body text-xs text-foreground/75 leading-relaxed text-pretty">{s}</span>
                               </div>
                             ))}
                           </div>
@@ -859,11 +853,11 @@ export default function TryOnPage() {
 
                         {analysis.recommendedColors && (
                           <div>
-                            <p className="font-body text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Recommended for You</p>
+                            <p className="font-body text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Recommended for You</p>
                             <div className="flex flex-wrap gap-2">
                               {analysis.recommendedColors.map((c, i) => (
-                                <div key={i} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLOR_PALETTE[c] || "#888" }} />
+                                <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border">
+                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }} />
                                   <span className="font-body text-xs text-foreground">{c}</span>
                                 </div>
                               ))}
@@ -875,7 +869,7 @@ export default function TryOnPage() {
 
                     {activeResultTab === "analysis" && !analysis && (
                       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                        <RefreshCw className="w-8 h-8 animate-spin mb-3" />
+                        <RefreshCw className="w-7 h-7 animate-spin mb-3 text-primary/50" />
                         <p className="font-body text-sm">Running AI analysis…</p>
                       </div>
                     )}
@@ -883,15 +877,14 @@ export default function TryOnPage() {
                 </div>
 
                 {/* RIGHT: Action panel (2 cols) */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Product info */}
+                <div className="lg:col-span-2 space-y-3">
                   {selectedProduct && (
-                    <div className="glass-card rounded-2xl p-4">
+                    <div className="bg-white rounded-[14px] border border-border p-4 shadow-soft">
                       <div className="flex gap-3 items-start">
-                        <img src={selectedProduct.image_url} alt={selectedProduct.name} className="w-16 h-20 rounded-xl object-cover flex-shrink-0" />
+                        <img src={selectedProduct.image_url} alt={selectedProduct.name} className="w-14 h-18 rounded-xl object-cover flex-shrink-0" style={{ height: "4.5rem" }} />
                         <div className="flex-1">
-                          <p className="font-body text-sm font-semibold text-foreground leading-tight mb-1">{selectedProduct.name}</p>
-                          <p className="font-display text-xl font-bold text-foreground">₹{selectedProduct.price.toLocaleString()}</p>
+                          <p className="font-body text-sm font-medium text-foreground leading-tight mb-1">{selectedProduct.name}</p>
+                          <p className="font-display text-xl font-semibold text-foreground">₹{selectedProduct.price.toLocaleString()}</p>
                           <div className="flex items-center gap-1 mt-1">
                             <Star className="w-3 h-3 fill-gold text-gold" />
                             <span className="font-body text-xs text-muted-foreground">4.8 · 200+ reviews</span>
@@ -900,42 +893,40 @@ export default function TryOnPage() {
                       </div>
                       {selectedColor && (
                         <div className="mt-3 flex items-center gap-2">
-                          <div className="w-4 h-4 rounded-full border border-white/20" style={{ backgroundColor: COLOR_PALETTE[selectedColor] || "#aaa" }} />
+                          <div className="w-3.5 h-3.5 rounded-full border border-border" style={{ backgroundColor: COLOR_PALETTE[selectedColor] || "#aaa" }} />
                           <span className="font-body text-xs text-muted-foreground">{selectedColor} · {selectedSize}</span>
                         </div>
                       )}
                     </div>
                   )}
 
-                  {/* Outfit tips */}
                   {analysis && (
-                    <div className="glass-card rounded-2xl p-4">
-                      <p className="font-body text-sm font-semibold text-foreground mb-3 flex items-center gap-1">
-                        <Star className="w-4 h-4 text-gold" /> Outfit Tips
+                    <div className="bg-white rounded-[14px] border border-border p-4 shadow-soft">
+                      <p className="font-body text-xs font-medium text-foreground mb-2.5 flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-gold" /> Outfit Tips
                       </p>
                       <div className="space-y-2">
                         {analysis.outfitTips.map((tip, i) => (
                           <div key={i} className="flex items-start gap-2">
-                            <CheckCircle className="w-3.5 h-3.5 text-green-400 mt-0.5 flex-shrink-0" />
-                            <span className="font-body text-xs text-foreground/80 leading-relaxed">{tip}</span>
+                            <CheckCircle className="w-3 h-3 text-accent-foreground mt-0.5 flex-shrink-0" />
+                            <span className="font-body text-xs text-foreground/75 leading-relaxed text-pretty">{tip}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Purchase buttons */}
-                  <div className="glass-card rounded-2xl p-4 space-y-2">
-                    <Button className="w-full h-11 bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold" onClick={() => navigate("/products")}>
+                  <div className="bg-white rounded-[14px] border border-border p-4 space-y-2 shadow-soft">
+                    <Button className="w-full h-10 bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-sm hover:bg-primary/90 transition-all" onClick={() => navigate("/products")}>
                       <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
                     </Button>
-                    <Button className="w-full h-11 bg-foreground text-background rounded-xl font-body font-semibold hover:opacity-90" onClick={() => navigate("/products")}>
+                    <Button className="w-full h-10 bg-foreground text-background rounded-xl font-body font-medium text-sm hover:opacity-90 transition-all" onClick={() => navigate("/products")}>
                       Buy Now →
                     </Button>
                     <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
-                        className="h-9 text-xs rounded-xl border-white/10 text-muted-foreground hover:text-foreground font-body"
+                        className="h-9 text-xs rounded-xl border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 font-body"
                         onClick={() => { setWishlisted(!wishlisted); toast({ title: wishlisted ? "Removed from wishlist" : "Saved to wishlist ❤️" }); }}
                       >
                         <Heart className="w-3.5 h-3.5 mr-1.5" fill={wishlisted ? "currentColor" : "none"} />
@@ -943,7 +934,7 @@ export default function TryOnPage() {
                       </Button>
                       <Button
                         variant="outline"
-                        className="h-9 text-xs rounded-xl border-white/10 text-muted-foreground hover:text-foreground font-body"
+                        className="h-9 text-xs rounded-xl border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 font-body"
                         onClick={() => setOutfitPanelOpen(true)}
                       >
                         <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Try Another
@@ -951,14 +942,13 @@ export default function TryOnPage() {
                     </div>
                   </div>
 
-                  {/* Re-upload / Remove in step 3 */}
-                  <div className="glass-card rounded-2xl p-4 space-y-2">
-                    <p className="font-body text-xs text-muted-foreground font-semibold uppercase tracking-wide mb-2">Your Photo</p>
+                  <div className="bg-white rounded-[14px] border border-border p-4 space-y-2 shadow-soft">
+                    <p className="font-body text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2">Your Photo</p>
                     {userPhoto && (
                       <div className="flex gap-3 items-center mb-3">
-                        <img src={userPhoto} alt="Your photo" className="w-14 h-18 rounded-xl object-cover flex-shrink-0" style={{ height: "4.5rem" }} />
+                        <img src={userPhoto} alt="Your photo" className="w-12 rounded-xl object-cover flex-shrink-0" style={{ height: "3.75rem" }} />
                         <div>
-                          <p className="font-body text-xs text-foreground font-semibold">Photo Active</p>
+                          <p className="font-body text-xs text-foreground font-medium">Photo Active</p>
                           <p className="font-body text-xs text-muted-foreground">Used for all try-ons</p>
                         </div>
                       </div>
@@ -967,7 +957,7 @@ export default function TryOnPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 text-xs rounded-xl border-primary/30 text-primary hover:bg-primary/5 font-body"
+                        className="h-9 text-xs rounded-xl border-primary/25 text-primary hover:bg-primary/5 font-body"
                         onClick={() => reuploadInputRef.current?.click()}
                       >
                         <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Re-upload
@@ -975,7 +965,7 @@ export default function TryOnPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 text-xs rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 font-body"
+                        className="h-9 text-xs rounded-xl border-destructive/25 text-destructive hover:bg-destructive/5 font-body"
                         onClick={removePhoto}
                       >
                         <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Remove
@@ -983,39 +973,48 @@ export default function TryOnPage() {
                     </div>
                   </div>
 
-                  {/* Social share compact */}
-                  <div className="glass-card rounded-2xl p-4">
-                    <p className="font-body text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide flex items-center gap-1.5">
+                  <div className="bg-white rounded-[14px] border border-border p-4 shadow-soft">
+                    <p className="font-body text-xs font-medium text-muted-foreground mb-2.5 uppercase tracking-wide flex items-center gap-1.5">
                       <Share2 className="w-3.5 h-3.5" /> Share My Look
                     </p>
                     <div className="flex gap-2">
-                      <button onClick={shareOnWhatsApp} className="flex-1 py-2 rounded-xl bg-green-500/20 border border-green-500/20 text-green-400 text-xs font-body font-semibold hover:bg-green-500/30 transition-colors">WhatsApp</button>
-                      <button onClick={shareOnFacebook} className="flex-1 py-2 rounded-xl bg-blue-500/20 border border-blue-500/20 text-blue-400 text-xs font-body font-semibold hover:bg-blue-500/30 transition-colors">Facebook</button>
-                      <button onClick={() => { navigator.clipboard?.writeText("https://apparel-ai-try.lovable.app"); toast({ title: "Link copied!" }); }} className="flex-1 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-body font-semibold hover:bg-primary/20 transition-colors">Copy Link</button>
+                      <button
+                        onClick={shareOnWhatsApp}
+                        className="flex-1 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                        style={{ background: "hsl(142 50% 95%)", borderColor: "hsl(142 35% 84%)", color: "hsl(142 45% 28%)" }}
+                      >WhatsApp</button>
+                      <button
+                        onClick={shareOnFacebook}
+                        className="flex-1 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                        style={{ background: "hsl(220 50% 95%)", borderColor: "hsl(220 35% 84%)", color: "hsl(220 50% 32%)" }}
+                      >Facebook</button>
+                      <button
+                        onClick={() => { navigator.clipboard?.writeText("https://apparel-ai-try.lovable.app"); toast({ title: "Link copied!" }); }}
+                        className="flex-1 py-2 rounded-xl bg-secondary border border-secondary-foreground/15 text-secondary-foreground text-xs font-body font-medium hover:bg-secondary/80 transition-colors"
+                      >Copy</button>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* ── Suggested Outfits Section ──────────────────────────── */}
-              <div ref={suggestionsRef} className="glass-card rounded-3xl p-6">
-                <div className="flex items-center justify-between mb-5">
+              <div ref={suggestionsRef} className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-foreground flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-gold" /> You May Also Like
+                    <h3 className="font-display text-xl font-semibold text-foreground flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-gold" /> You May Also Like
                     </h3>
-                    <p className="font-body text-sm text-muted-foreground mt-0.5">Try these similar styles — your photo stays the same</p>
+                    <p className="font-body text-xs text-muted-foreground mt-0.5">Try these similar styles — your photo stays the same</p>
                   </div>
                   <Button
                     onClick={() => setOutfitPanelOpen(true)}
-                    className="bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold text-sm px-5 h-10"
+                    className="bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-xs px-4 h-9 hover:bg-primary/90"
                   >
-                    <RefreshCw className="w-4 h-4 mr-2" /> Try Another Outfit
+                    <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Try Another
                   </Button>
                 </div>
 
-                {/* Horizontal scrollable row */}
-                <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory">
+                <div className="flex gap-2.5 overflow-x-auto pb-1.5 snap-x snap-mandatory">
                   {suggestions.map((product) => (
                     <div key={product.id} className="snap-start">
                       <SuggestionCard
@@ -1027,9 +1026,9 @@ export default function TryOnPage() {
                   ))}
                 </div>
 
-                <p className="font-body text-xs text-muted-foreground text-center mt-4 flex items-center justify-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-primary" />
-                  Click any outfit above to instantly generate a new AI try-on with your same photo
+                <p className="font-body text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-1.5">
+                  <Zap className="w-3 h-3 text-primary" />
+                  Click any outfit to instantly generate a new AI try-on with your same photo
                 </p>
               </div>
             </div>
@@ -1038,29 +1037,29 @@ export default function TryOnPage() {
         </div>
       </div>
 
-      {/* ── Try Another Outfit Panel (slide-up) ─────────────────────── */}
+      {/* ── Try Another Outfit Panel ─────────────────────────────────────── */}
       {outfitPanelOpen && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOutfitPanelOpen(false)} />
-          <div className="relative w-full max-w-2xl bg-background rounded-t-3xl md:rounded-3xl p-6 shadow-2xl z-10 max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="font-display text-2xl font-bold text-foreground">Select Outfit</h3>
-              <button onClick={() => setOutfitPanelOpen(false)} className="w-9 h-9 rounded-full glass-card flex items-center justify-center text-muted-foreground hover:text-foreground">
-                <X className="w-5 h-5" />
+          <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setOutfitPanelOpen(false)} />
+          <div className="relative w-full max-w-2xl bg-background rounded-t-3xl md:rounded-[14px] p-5 shadow-lg z-10 max-h-[80vh] overflow-y-auto border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl font-semibold text-foreground">Select Outfit</h3>
+              <button onClick={() => setOutfitPanelOpen(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground border border-border">
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <p className="font-body text-sm text-muted-foreground mb-4">Your uploaded photo will be reused automatically.</p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <p className="font-body text-xs text-muted-foreground mb-4">Your uploaded photo will be reused automatically.</p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
               {SAMPLE_PRODUCTS.map((product) => (
                 <div
                   key={product.id}
                   onClick={() => { handleSelectProduct(product); if (userPhoto) runFullAnalysisFor(product, product.colors[0]); }}
-                  className={`rounded-xl overflow-hidden cursor-pointer transition-all border-2 hover:scale-[1.03] ${
-                    selectedProduct?.id === product.id ? "border-primary shadow-brand" : "border-transparent hover:border-white/20"
+                  className={`rounded-[14px] overflow-hidden cursor-pointer transition-all border-2 hover:scale-[1.03] ${
+                    selectedProduct?.id === product.id ? "border-primary shadow-soft" : "border-transparent hover:border-primary/25"
                   }`}
                 >
                   <img src={product.image_url} alt={product.name} className="w-full aspect-[3/4] object-cover" />
-                  <div className="p-1.5">
+                  <div className="p-1.5 bg-muted/30">
                     <p className="font-body text-xs text-foreground font-medium leading-tight line-clamp-1">{product.name}</p>
                     <p className="font-body text-xs text-primary font-semibold">₹{product.price.toLocaleString()}</p>
                   </div>
@@ -1074,19 +1073,20 @@ export default function TryOnPage() {
       {/* ── AI Fashion Chat ─────────────────────────────────────────────────── */}
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-hero shadow-brand items-center justify-center hidden md:flex"
+        className="fixed bottom-6 right-6 z-40 w-13 h-13 rounded-full bg-primary shadow-soft items-center justify-center hidden md:flex"
+        style={{ width: "3.25rem", height: "3.25rem" }}
       >
-        {chatOpen ? <X className="w-6 h-6 text-white" /> : <MessageCircle className="w-6 h-6 text-white" />}
+        {chatOpen ? <X className="w-5 h-5 text-white" /> : <MessageCircle className="w-5 h-5 text-white" />}
       </button>
 
       {chatOpen && (
-        <div className="fixed bottom-24 right-6 z-40 w-80 h-96 glass-card rounded-2xl border border-white/10 flex flex-col shadow-xl overflow-hidden">
-          <div className="p-3 bg-gradient-hero flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold font-body text-sm">P</div>
+        <div className="fixed bottom-24 right-6 z-40 w-76 h-96 bg-white rounded-[14px] border border-border flex flex-col shadow-lg overflow-hidden" style={{ width: "19rem" }}>
+          <div className="p-3 bg-primary flex items-center gap-2 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-medium font-body text-sm">P</div>
             <div>
-              <p className="font-body text-sm font-semibold text-white">Priya – AI Stylist</p>
+              <p className="font-body text-sm font-medium text-white">Priya – AI Stylist</p>
               <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-300" />
+                <div className="w-1.5 h-1.5 rounded-full bg-white/70" />
                 <p className="font-body text-xs text-white/70">Online</p>
               </div>
             </div>
@@ -1094,11 +1094,11 @@ export default function TryOnPage() {
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2.5 bg-muted/20">
             {chatMessages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[85%] px-3 py-2 rounded-2xl font-body text-xs leading-relaxed ${
-                  msg.role === "user" ? "bg-gradient-hero text-white rounded-br-md" : "bg-white/10 text-foreground rounded-bl-md"
+                  msg.role === "user" ? "bg-primary text-white rounded-br-sm" : "bg-white border border-border text-foreground rounded-bl-sm shadow-soft"
                 }`}>
                   {msg.content}
                 </div>
@@ -1106,9 +1106,9 @@ export default function TryOnPage() {
             ))}
             {chatLoading && (
               <div className="flex justify-start">
-                <div className="bg-white/10 rounded-2xl rounded-bl-md px-3 py-2">
+                <div className="bg-white border border-border rounded-2xl rounded-bl-sm px-3 py-2 shadow-soft">
                   <div className="flex gap-1">
-                    {[0,150,300].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
+                    {[0,120,240].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
                   </div>
                 </div>
               </div>
@@ -1116,21 +1116,21 @@ export default function TryOnPage() {
             <div ref={chatEndRef} />
           </div>
           {chatMessages.length === 1 && (
-            <div className="px-3 pb-2 flex gap-1.5 overflow-x-auto">
-              {["Does this suit me?", "Best colors for me?", "What size should I buy?"].map(q => (
-                <button key={q} onClick={() => setChatInput(q)} className="whitespace-nowrap px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-body hover:bg-primary/20 transition-colors flex-shrink-0">{q}</button>
+            <div className="px-3 pb-2 flex gap-1.5 overflow-x-auto bg-white border-t border-border">
+              {["Does this suit me?", "Best colors?", "What size?"].map(q => (
+                <button key={q} onClick={() => setChatInput(q)} className="whitespace-nowrap mt-2 px-2.5 py-1 rounded-full bg-secondary border border-secondary-foreground/15 text-secondary-foreground text-xs font-body hover:bg-secondary/80 transition-colors flex-shrink-0">{q}</button>
               ))}
             </div>
           )}
-          <div className="p-3 border-t border-white/10 flex gap-2 flex-shrink-0">
+          <div className="p-3 border-t border-border flex gap-2 flex-shrink-0 bg-white">
             <input
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && sendChat()}
               placeholder="Ask Priya anything…"
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-body text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/40"
+              className="flex-1 bg-muted/40 border border-border rounded-xl px-3 py-2 text-xs font-body text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/40 transition-colors"
             />
-            <button onClick={sendChat} disabled={chatLoading || !chatInput.trim()} className="w-8 h-8 rounded-xl bg-gradient-hero flex items-center justify-center disabled:opacity-40 flex-shrink-0">
+            <button onClick={sendChat} disabled={chatLoading || !chatInput.trim()} className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40 flex-shrink-0 hover:bg-primary/90 transition-colors">
               <Send className="w-3.5 h-3.5 text-white" />
             </button>
           </div>
