@@ -490,115 +490,112 @@ export default function TryOnPage() {
       {/* Mobile FAB – chat */}
       <button
         onClick={() => setChatOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-hero shadow-brand flex items-center justify-center md:hidden"
+        className="fixed bottom-6 right-6 z-40 w-13 h-13 rounded-full bg-primary shadow-soft flex items-center justify-center md:hidden"
+        style={{ width: "3.25rem", height: "3.25rem" }}
       >
-        <MessageCircle className="w-6 h-6 text-white" />
+        <MessageCircle className="w-5 h-5 text-white" />
       </button>
 
-      <div className="pt-28 pb-20 px-4">
+      <div className="pt-24 pb-20 px-4">
         <div className="container mx-auto max-w-6xl">
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-4">
-              <Sparkles className="w-4 h-4 text-gold" />
-              <span className="font-body text-sm text-muted-foreground">AI-Powered Virtual Try-On</span>
+          <div className="text-center mb-7">
+            <div className="pill-blush mb-4 inline-flex">
+              <Sparkles className="w-3.5 h-3.5" />
+              AI-Powered Virtual Try-On
             </div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-3">
-              Virtual <span className="gradient-gold-text">Try-On</span>
+            <h1 className="font-display text-3xl md:text-4xl font-medium text-foreground mb-2.5 text-balance">
+              Virtual <span className="gradient-text">Try-On</span>
             </h1>
-            <p className="font-body text-muted-foreground text-lg">Upload your photo and see how any outfit looks on you — instantly</p>
+            <p className="font-body text-muted-foreground text-base text-pretty">Upload your photo and see how any outfit looks on you — instantly</p>
           </div>
 
           {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="flex items-center justify-center gap-2.5 mb-7">
             {[{ n: 1, label: "Upload Photo" }, { n: 2, label: "Select Outfit" }, { n: 3, label: "AI Try-On" }].map(({ n, label }, i) => (
-              <div key={n} className="flex items-center gap-3">
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-body text-sm font-semibold transition-all ${
-                  step === n ? "bg-gradient-hero text-white shadow-brand" :
-                  step > n ? "bg-primary/20 text-primary" : "glass-card text-muted-foreground"
+              <div key={n} className="flex items-center gap-2.5">
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full font-body text-sm font-medium transition-all ${
+                  step === n ? "bg-primary text-primary-foreground shadow-soft" :
+                  step > n ? "bg-primary/10 text-primary" : "bg-white border border-border text-muted-foreground"
                 }`}>
-                  {step > n ? <CheckCircle className="w-4 h-4" /> : <span>{n}</span>}
-                  <span className="hidden md:inline">{label}</span>
+                  {step > n ? <CheckCircle className="w-3.5 h-3.5" /> : <span className="text-xs">{n}</span>}
+                  <span className="hidden md:inline text-xs">{label}</span>
                 </div>
-                {i < 2 && <ArrowRight className="w-4 h-4 text-muted-foreground" />}
+                {i < 2 && <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/50" />}
               </div>
             ))}
           </div>
 
           {/* ── Step 1+2: Upload & Select ─────────────────────────────── */}
           {step !== 3 && (
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-5">
               {/* LEFT: Photo upload */}
-              <div className="glass-card rounded-3xl p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Camera className="w-5 h-5 text-primary" /> Your Photo
+              <div className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-primary" /> Your Photo
                 </h2>
 
                 {!userPhoto ? (
                   <>
-                    {/* Upload guidelines */}
-                    <div className="mb-4 p-3 rounded-xl bg-primary/5 border border-primary/10">
-                      <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                    <div className="mb-4 p-3 rounded-xl bg-primary/4 border border-primary/10">
+                      <p className="font-body text-xs text-muted-foreground leading-relaxed text-pretty">
                         📸 <strong className="text-foreground">Best results:</strong> Upload a clear front-facing full-body or half-body photo with good lighting. Plain background preferred.
                       </p>
                     </div>
 
-                    {/* Drag & Drop zone */}
                     <div
                       onDragOver={(e) => { e.preventDefault(); setDraggingFile(true); }}
                       onDragLeave={() => setDraggingFile(false)}
                       onDrop={handleDrop}
                       onClick={() => fileInputRef.current?.click()}
-                      className={`border-2 border-dashed rounded-2xl aspect-[3/4] flex flex-col items-center justify-center cursor-pointer transition-all group ${
-                        draggingFile ? "border-primary bg-primary/5 scale-[1.01]" : "border-white/20 hover:border-primary/50"
+                      className={`border-2 border-dashed rounded-[14px] aspect-[3/4] flex flex-col items-center justify-center cursor-pointer transition-all group ${
+                        draggingFile ? "border-primary bg-primary/4 scale-[1.01]" : "border-border hover:border-primary/40 hover:bg-primary/2"
                       }`}
                     >
-                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                        <Upload className="w-8 h-8 text-primary" />
+                      <div className="w-14 h-14 rounded-2xl bg-primary/8 flex items-center justify-center mb-3 group-hover:bg-primary/14 transition-colors">
+                        <Upload className="w-7 h-7 text-primary" />
                       </div>
-                      <p className="font-body font-semibold text-foreground mb-1">Drag & drop or click to upload</p>
-                      <p className="font-body text-sm text-muted-foreground text-center px-4">JPG / PNG / HEIC · Max 10MB</p>
+                      <p className="font-body font-medium text-foreground text-sm mb-1">Drag & drop or click to upload</p>
+                      <p className="font-body text-xs text-muted-foreground text-center px-4">JPG / PNG / HEIC · Max 10MB</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mt-4">
-                      <Button onClick={() => fileInputRef.current?.click()} className="h-11 bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold hover:scale-105 transition-transform">
+                      <Button onClick={() => fileInputRef.current?.click()} className="h-10 bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-sm hover:bg-primary/90 transition-all">
                         <Upload className="w-4 h-4 mr-2" /> Gallery
                       </Button>
-                      <Button onClick={() => cameraInputRef.current?.click()} variant="outline" className="h-11 rounded-xl border-white/10 text-foreground font-body font-semibold hover:bg-white/5">
+                      <Button onClick={() => cameraInputRef.current?.click()} variant="outline" className="h-10 rounded-xl border-border text-foreground font-body font-medium text-sm hover:bg-muted/50">
                         <Camera className="w-4 h-4 mr-2" /> Camera
                       </Button>
                     </div>
                   </>
                 ) : (
                   <>
-                    {/* Photo preview with re-upload / remove */}
-                    <div className="relative rounded-2xl overflow-hidden aspect-[3/4]">
+                    <div className="relative rounded-[14px] overflow-hidden aspect-[3/4]">
                       <img src={userPhoto} alt="Your photo" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <div className="glass-card rounded-xl p-2.5 flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                          <p className="font-body text-xs text-white font-semibold">✔ Photo Ready — select an outfit!</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2.5 flex items-center gap-2 border border-border">
+                          <CheckCircle className="w-3.5 h-3.5 text-accent-foreground flex-shrink-0" />
+                          <p className="font-body text-xs text-foreground font-medium">Photo Ready — select an outfit!</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Re-upload / Remove buttons */}
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       <Button
                         onClick={() => reuploadInputRef.current?.click()}
                         variant="outline"
-                        className="h-11 rounded-xl border-primary/30 text-primary hover:bg-primary/5 font-body font-semibold"
+                        className="h-10 rounded-xl border-primary/25 text-primary hover:bg-primary/5 font-body font-medium text-sm"
                       >
-                        <RotateCcw className="w-4 h-4 mr-2" /> Re-upload Photo
+                        <RotateCcw className="w-3.5 h-3.5 mr-2" /> Re-upload
                       </Button>
                       <Button
                         onClick={removePhoto}
                         variant="outline"
-                        className="h-11 rounded-xl border-destructive/30 text-destructive hover:bg-destructive/5 font-body font-semibold"
+                        className="h-10 rounded-xl border-destructive/25 text-destructive hover:bg-destructive/5 font-body font-medium text-sm"
                       >
-                        <Trash2 className="w-4 h-4 mr-2" /> Remove Photo
+                        <Trash2 className="w-3.5 h-3.5 mr-2" /> Remove
                       </Button>
                     </div>
                   </>
@@ -608,10 +605,9 @@ export default function TryOnPage() {
                 <input ref={reuploadInputRef} type="file" accept="image/*" className="hidden" onChange={handleReuploadInput} />
                 <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileInput} />
 
-                {/* Privacy note */}
                 <div className="mt-4 flex items-start gap-2">
-                  <Shield className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <p className="font-body text-xs text-muted-foreground">
+                  <Shield className="w-3.5 h-3.5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <p className="font-body text-xs text-muted-foreground text-pretty">
                     Your image is used only for virtual try-on processing and is not stored permanently.
                   </p>
                 </div>
@@ -627,24 +623,24 @@ export default function TryOnPage() {
               </div>
 
               {/* RIGHT: Product selection */}
-              <div className="glass-card rounded-3xl p-6">
-                <h2 className="font-display text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" /> Select Outfit
+              <div className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
+                <h2 className="font-display text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" /> Select Outfit
                 </h2>
 
-                <div className="grid grid-cols-3 gap-2.5 mb-4 max-h-72 overflow-y-auto pr-1">
+                <div className="grid grid-cols-3 gap-2 mb-4 max-h-64 overflow-y-auto pr-1">
                   {SAMPLE_PRODUCTS.map((product) => (
                     <div
                       key={product.id}
                       onClick={() => handleSelectProduct(product)}
-                      className={`rounded-xl overflow-hidden cursor-pointer transition-all border-2 ${
+                      className={`rounded-[14px] overflow-hidden cursor-pointer transition-all border-2 ${
                         selectedProduct?.id === product.id
-                          ? "border-primary shadow-brand scale-[1.03]"
-                          : "border-transparent hover:border-white/20"
+                          ? "border-primary shadow-soft scale-[1.03]"
+                          : "border-transparent hover:border-primary/25"
                       }`}
                     >
                       <img src={product.image_url} alt={product.name} className="w-full aspect-[3/4] object-cover" />
-                      <div className="p-1.5">
+                      <div className="p-1.5 bg-muted/30">
                         <p className="font-body text-xs text-foreground font-medium leading-tight line-clamp-1">{product.name}</p>
                         <p className="font-body text-xs text-primary font-semibold">₹{product.price.toLocaleString()}</p>
                       </div>
@@ -652,18 +648,17 @@ export default function TryOnPage() {
                   ))}
                 </div>
 
-                {/* Color & Size selectors */}
                 {selectedProduct && (
-                  <div className="space-y-3 mb-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div className="space-y-3 mb-4 p-3 rounded-xl bg-muted/30 border border-border">
                     <div>
-                      <p className="font-body text-xs text-muted-foreground mb-2 font-semibold uppercase tracking-wide">Color</p>
+                      <p className="font-body text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Color</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedProduct.colors.map(c => (
                           <button
                             key={c}
                             onClick={() => setSelectedColor(c)}
                             title={c}
-                            className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c ? "border-foreground scale-110 shadow-md" : "border-transparent"}`}
+                            className={`w-6 h-6 rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c ? "border-foreground scale-110 shadow-sm" : "border-transparent"}`}
                             style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }}
                           />
                         ))}
@@ -671,16 +666,16 @@ export default function TryOnPage() {
                       {selectedColor && <p className="font-body text-xs text-muted-foreground mt-1">{selectedColor}</p>}
                     </div>
                     <div>
-                      <p className="font-body text-xs text-muted-foreground mb-2 font-semibold uppercase tracking-wide">Size</p>
+                      <p className="font-body text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Size</p>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedProduct.sizes.map(s => (
                           <button
                             key={s}
                             onClick={() => setSelectedSize(s)}
-                            className={`px-3 py-1 rounded-lg font-body text-xs font-semibold transition-all border ${
+                            className={`px-2.5 py-1 rounded-lg font-body text-xs font-medium transition-all border ${
                               selectedSize === s
                                 ? "bg-primary text-primary-foreground border-primary"
-                                : "border-white/10 text-muted-foreground hover:text-foreground hover:border-white/30"
+                                : "border-border text-muted-foreground hover:text-foreground hover:border-primary/25"
                             }`}
                           >
                             {s}
@@ -694,7 +689,7 @@ export default function TryOnPage() {
                 <Button
                   onClick={runFullAnalysis}
                   disabled={!userPhoto || !selectedProduct || analyzing}
-                  className="w-full h-12 bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold hover:scale-105 transition-transform shadow-brand disabled:opacity-50 disabled:scale-100"
+                  className="w-full h-11 bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-sm hover:bg-primary/90 transition-all shadow-soft disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {analyzing ? (
                     <span className="flex items-center gap-2">
