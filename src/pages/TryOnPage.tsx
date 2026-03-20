@@ -719,30 +719,428 @@ export default function TryOnPage() {
                     <div className="flex gap-2 mb-4">
                       <button
                         onClick={() => setActiveResultTab("tryon")}
-                        className={`flex-1 py-2 rounded-xl font-body text-sm font-semibold transition-all ${activeResultTab === "tryon" ? "bg-gradient-hero text-white" : "glass-card text-muted-foreground hover:text-foreground"}`}
+                        className={`flex-1 py-2 rounded-xl font-body text-xs font-medium transition-all border ${activeResultTab === "tryon" ? "bg-primary text-primary-foreground border-primary shadow-soft" : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"}`}
                       >
-                        <Eye className="w-4 h-4 inline mr-1.5" />Try-On View
+                        <Eye className="w-3.5 h-3.5 inline mr-1.5" />Try-On View
                       </button>
                       <button
                         onClick={() => setActiveResultTab("analysis")}
-                        className={`flex-1 py-2 rounded-xl font-body text-sm font-semibold transition-all ${activeResultTab === "analysis" ? "bg-gradient-hero text-white" : "glass-card text-muted-foreground hover:text-foreground"}`}
+                        className={`flex-1 py-2 rounded-xl font-body text-xs font-medium transition-all border ${activeResultTab === "analysis" ? "bg-primary text-primary-foreground border-primary shadow-soft" : "bg-muted/40 border-border text-muted-foreground hover:text-foreground"}`}
                       >
-                        <Sparkles className="w-4 h-4 inline mr-1.5" />AI Analysis
+                        <Sparkles className="w-3.5 h-3.5 inline mr-1.5" />AI Analysis
                       </button>
                     </div>
 
                     {activeResultTab === "tryon" && (
                       <>
-                        {/* Image area */}
                         {analyzing || generatingImage ? (
                           <GeneratingOverlay />
                         ) : tryOnImage && userPhoto ? (
                           <BeforeAfterSlider before={userPhoto} after={tryOnImage} />
                         ) : (
-                          <div className="aspect-[3/4] rounded-2xl overflow-hidden">
+                          <div className="aspect-[3/4] rounded-[14px] overflow-hidden">
                             <img src={userPhoto!} alt="Original" className="w-full h-full object-cover" />
                           </div>
                         )}
+
+                        {selectedProduct && !analyzing && (
+                          <div className="mt-4">
+                            <p className="font-body text-xs text-muted-foreground mb-2 font-medium">Try other colors</p>
+                            <div className="flex gap-2 flex-wrap">
+                              {selectedProduct.colors.map(c => (
+                                <button
+                                  key={c}
+                                  onClick={() => switchColor(c)}
+                                  title={c}
+                                  disabled={generatingImage}
+                                  className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 disabled:opacity-50 ${selectedColor === c ? "border-foreground scale-110 shadow-sm" : "border-transparent"}`}
+                                  style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {tryOnImage && !analyzing && (
+                          <div className="mt-4 flex gap-2 flex-wrap">
+                            <button
+                              onClick={downloadLook}
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-muted/50 border border-border text-foreground text-xs font-body font-medium hover:bg-muted transition-colors"
+                            >
+                              <Download className="w-3.5 h-3.5" /> Download
+                            </button>
+                            <button
+                              onClick={shareOnWhatsApp}
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                              style={{ background: "hsl(142 60% 96%)", borderColor: "hsl(142 40% 85%)", color: "hsl(142 50% 30%)" }}
+                            >
+                              WhatsApp
+                            </button>
+                            <button
+                              onClick={shareOnFacebook}
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                              style={{ background: "hsl(220 60% 96%)", borderColor: "hsl(220 40% 85%)", color: "hsl(220 50% 35%)" }}
+                            >
+                              Facebook
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {activeResultTab === "analysis" && analysis && (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div className="bg-primary/6 rounded-xl p-3">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <Palette className="w-3.5 h-3.5 text-primary" />
+                              <span className="font-body text-xs text-muted-foreground">Skin Tone</span>
+                            </div>
+                            <p className="font-body text-sm font-medium text-foreground">{analysis.skinTone}</p>
+                          </div>
+                          <div className="bg-primary/6 rounded-xl p-3">
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <Ruler className="w-3.5 h-3.5 text-primary" />
+                              <span className="font-body text-xs text-muted-foreground">Body Shape</span>
+                            </div>
+                            <p className="font-body text-sm font-medium text-foreground">{analysis.bodyShape}</p>
+                          </div>
+                        </div>
+
+                        {analysis.recommendedSize && (
+                          <div className="bg-gold/8 border border-gold/20 rounded-xl p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="font-body text-xs text-gold-dark font-medium uppercase tracking-wide">Recommended Size</p>
+                              <span className="font-display text-xl font-semibold text-foreground">{analysis.recommendedSize}</span>
+                            </div>
+                            {analysis.fitScore && (
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <p className="font-body text-xs text-muted-foreground">Fit Score</p>
+                                  <p className="font-body text-xs font-medium text-foreground">{analysis.fitScore}% match</p>
+                                </div>
+                                <div className="h-1.5 rounded-full bg-border">
+                                  <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${analysis.fitScore}%` }} />
+                                </div>
+                                <div className="flex justify-between mt-1">
+                                  {["Tight", "Perfect", "Loose"].map(f => (
+                                    <span key={f} className="font-body text-xs text-muted-foreground">{f}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="bg-secondary/60 border border-secondary rounded-xl p-3">
+                          <p className="font-body text-xs text-primary font-medium mb-1">✨ Best Fit</p>
+                          <p className="font-body text-sm text-foreground text-pretty">{analysis.bestFit}</p>
+                        </div>
+
+                        <div>
+                          <p className="font-body text-xs font-medium text-foreground mb-2 flex items-center gap-1">
+                            <Palette className="w-3.5 h-3.5 text-primary" /> Color Suggestions
+                          </p>
+                          <div className="space-y-1.5">
+                            {analysis.colorSuggestions.map((s, i) => (
+                              <div key={i} className="flex items-start gap-2">
+                                <span className="text-primary mt-0.5 text-xs">→</span>
+                                <span className="font-body text-xs text-foreground/75 leading-relaxed text-pretty">{s}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {analysis.recommendedColors && (
+                          <div>
+                            <p className="font-body text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Recommended for You</p>
+                            <div className="flex flex-wrap gap-2">
+                              {analysis.recommendedColors.map((c, i) => (
+                                <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/50 border border-border">
+                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }} />
+                                  <span className="font-body text-xs text-foreground">{c}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeResultTab === "analysis" && !analysis && (
+                      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                        <RefreshCw className="w-7 h-7 animate-spin mb-3 text-primary/50" />
+                        <p className="font-body text-sm">Running AI analysis…</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* RIGHT: Action panel (2 cols) */}
+                <div className="lg:col-span-2 space-y-3">
+                  {selectedProduct && (
+                    <div className="bg-white rounded-[14px] border border-border p-4 shadow-soft">
+                      <div className="flex gap-3 items-start">
+                        <img src={selectedProduct.image_url} alt={selectedProduct.name} className="w-14 h-18 rounded-xl object-cover flex-shrink-0" style={{ height: "4.5rem" }} />
+                        <div className="flex-1">
+                          <p className="font-body text-sm font-medium text-foreground leading-tight mb-1">{selectedProduct.name}</p>
+                          <p className="font-display text-xl font-semibold text-foreground">₹{selectedProduct.price.toLocaleString()}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <Star className="w-3 h-3 fill-gold text-gold" />
+                            <span className="font-body text-xs text-muted-foreground">4.8 · 200+ reviews</span>
+                          </div>
+                        </div>
+                      </div>
+                      {selectedColor && (
+                        <div className="mt-3 flex items-center gap-2">
+                          <div className="w-3.5 h-3.5 rounded-full border border-border" style={{ backgroundColor: COLOR_PALETTE[selectedColor] || "#aaa" }} />
+                          <span className="font-body text-xs text-muted-foreground">{selectedColor} · {selectedSize}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {analysis && (
+                    <div className="bg-white rounded-[14px] border border-border p-4 shadow-soft">
+                      <p className="font-body text-xs font-medium text-foreground mb-2.5 flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 text-gold" /> Outfit Tips
+                      </p>
+                      <div className="space-y-2">
+                        {analysis.outfitTips.map((tip, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <CheckCircle className="w-3 h-3 text-accent-foreground mt-0.5 flex-shrink-0" />
+                            <span className="font-body text-xs text-foreground/75 leading-relaxed text-pretty">{tip}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-white rounded-[14px] border border-border p-4 space-y-2 shadow-soft">
+                    <Button className="w-full h-10 bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-sm hover:bg-primary/90 transition-all" onClick={() => navigate("/products")}>
+                      <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
+                    </Button>
+                    <Button className="w-full h-10 bg-foreground text-background rounded-xl font-body font-medium text-sm hover:opacity-90 transition-all" onClick={() => navigate("/products")}>
+                      Buy Now →
+                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        className="h-9 text-xs rounded-xl border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 font-body"
+                        onClick={() => { setWishlisted(!wishlisted); toast({ title: wishlisted ? "Removed from wishlist" : "Saved to wishlist ❤️" }); }}
+                      >
+                        <Heart className="w-3.5 h-3.5 mr-1.5" fill={wishlisted ? "currentColor" : "none"} />
+                        {wishlisted ? "Saved" : "Save Look"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-9 text-xs rounded-xl border-border text-muted-foreground hover:text-foreground hover:bg-muted/50 font-body"
+                        onClick={() => setOutfitPanelOpen(true)}
+                      >
+                        <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Try Another
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-[14px] border border-border p-4 space-y-2 shadow-soft">
+                    <p className="font-body text-xs text-muted-foreground font-medium uppercase tracking-wide mb-2">Your Photo</p>
+                    {userPhoto && (
+                      <div className="flex gap-3 items-center mb-3">
+                        <img src={userPhoto} alt="Your photo" className="w-12 rounded-xl object-cover flex-shrink-0" style={{ height: "3.75rem" }} />
+                        <div>
+                          <p className="font-body text-xs text-foreground font-medium">Photo Active</p>
+                          <p className="font-body text-xs text-muted-foreground">Used for all try-ons</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 text-xs rounded-xl border-primary/25 text-primary hover:bg-primary/5 font-body"
+                        onClick={() => reuploadInputRef.current?.click()}
+                      >
+                        <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Re-upload
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 text-xs rounded-xl border-destructive/25 text-destructive hover:bg-destructive/5 font-body"
+                        onClick={removePhoto}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Remove
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-[14px] border border-border p-4 shadow-soft">
+                    <p className="font-body text-xs font-medium text-muted-foreground mb-2.5 uppercase tracking-wide flex items-center gap-1.5">
+                      <Share2 className="w-3.5 h-3.5" /> Share My Look
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={shareOnWhatsApp}
+                        className="flex-1 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                        style={{ background: "hsl(142 50% 95%)", borderColor: "hsl(142 35% 84%)", color: "hsl(142 45% 28%)" }}
+                      >WhatsApp</button>
+                      <button
+                        onClick={shareOnFacebook}
+                        className="flex-1 py-2 rounded-xl border text-xs font-body font-medium transition-colors"
+                        style={{ background: "hsl(220 50% 95%)", borderColor: "hsl(220 35% 84%)", color: "hsl(220 50% 32%)" }}
+                      >Facebook</button>
+                      <button
+                        onClick={() => { navigator.clipboard?.writeText("https://apparel-ai-try.lovable.app"); toast({ title: "Link copied!" }); }}
+                        className="flex-1 py-2 rounded-xl bg-secondary border border-secondary-foreground/15 text-secondary-foreground text-xs font-body font-medium hover:bg-secondary/80 transition-colors"
+                      >Copy</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Suggested Outfits Section ──────────────────────────── */}
+              <div ref={suggestionsRef} className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-display text-xl font-semibold text-foreground flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-gold" /> You May Also Like
+                    </h3>
+                    <p className="font-body text-xs text-muted-foreground mt-0.5">Try these similar styles — your photo stays the same</p>
+                  </div>
+                  <Button
+                    onClick={() => setOutfitPanelOpen(true)}
+                    className="bg-primary text-primary-foreground border-0 rounded-xl font-body font-medium text-xs px-4 h-9 hover:bg-primary/90"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Try Another
+                  </Button>
+                </div>
+
+                <div className="flex gap-2.5 overflow-x-auto pb-1.5 snap-x snap-mandatory">
+                  {suggestions.map((product) => (
+                    <div key={product.id} className="snap-start">
+                      <SuggestionCard
+                        product={product}
+                        current={selectedProduct?.id === product.id}
+                        onSelect={() => trySuggestedOutfit(product)}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <p className="font-body text-xs text-muted-foreground text-center mt-3 flex items-center justify-center gap-1.5">
+                  <Zap className="w-3 h-3 text-primary" />
+                  Click any outfit to instantly generate a new AI try-on with your same photo
+                </p>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      {/* ── Try Another Outfit Panel ─────────────────────────────────────── */}
+      {outfitPanelOpen && (
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+          <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setOutfitPanelOpen(false)} />
+          <div className="relative w-full max-w-2xl bg-background rounded-t-3xl md:rounded-[14px] p-5 shadow-lg z-10 max-h-[80vh] overflow-y-auto border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl font-semibold text-foreground">Select Outfit</h3>
+              <button onClick={() => setOutfitPanelOpen(false)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground border border-border">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="font-body text-xs text-muted-foreground mb-4">Your uploaded photo will be reused automatically.</p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+              {SAMPLE_PRODUCTS.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => { handleSelectProduct(product); if (userPhoto) runFullAnalysisFor(product, product.colors[0]); }}
+                  className={`rounded-[14px] overflow-hidden cursor-pointer transition-all border-2 hover:scale-[1.03] ${
+                    selectedProduct?.id === product.id ? "border-primary shadow-soft" : "border-transparent hover:border-primary/25"
+                  }`}
+                >
+                  <img src={product.image_url} alt={product.name} className="w-full aspect-[3/4] object-cover" />
+                  <div className="p-1.5 bg-muted/30">
+                    <p className="font-body text-xs text-foreground font-medium leading-tight line-clamp-1">{product.name}</p>
+                    <p className="font-body text-xs text-primary font-semibold">₹{product.price.toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── AI Fashion Chat ─────────────────────────────────────────────────── */}
+      <button
+        onClick={() => setChatOpen(!chatOpen)}
+        className="fixed bottom-6 right-6 z-40 w-13 h-13 rounded-full bg-primary shadow-soft items-center justify-center hidden md:flex"
+        style={{ width: "3.25rem", height: "3.25rem" }}
+      >
+        {chatOpen ? <X className="w-5 h-5 text-white" /> : <MessageCircle className="w-5 h-5 text-white" />}
+      </button>
+
+      {chatOpen && (
+        <div className="fixed bottom-24 right-6 z-40 w-76 h-96 bg-white rounded-[14px] border border-border flex flex-col shadow-lg overflow-hidden" style={{ width: "19rem" }}>
+          <div className="p-3 bg-primary flex items-center gap-2 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-medium font-body text-sm">P</div>
+            <div>
+              <p className="font-body text-sm font-medium text-white">Priya – AI Stylist</p>
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/70" />
+                <p className="font-body text-xs text-white/70">Online</p>
+              </div>
+            </div>
+            <button onClick={() => setChatOpen(false)} className="ml-auto text-white/70 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-2.5 bg-muted/20">
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[85%] px-3 py-2 rounded-2xl font-body text-xs leading-relaxed ${
+                  msg.role === "user" ? "bg-primary text-white rounded-br-sm" : "bg-white border border-border text-foreground rounded-bl-sm shadow-soft"
+                }`}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {chatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-white border border-border rounded-2xl rounded-bl-sm px-3 py-2 shadow-soft">
+                  <div className="flex gap-1">
+                    {[0,120,240].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+          {chatMessages.length === 1 && (
+            <div className="px-3 pb-2 flex gap-1.5 overflow-x-auto bg-white border-t border-border">
+              {["Does this suit me?", "Best colors?", "What size?"].map(q => (
+                <button key={q} onClick={() => setChatInput(q)} className="whitespace-nowrap mt-2 px-2.5 py-1 rounded-full bg-secondary border border-secondary-foreground/15 text-secondary-foreground text-xs font-body hover:bg-secondary/80 transition-colors flex-shrink-0">{q}</button>
+              ))}
+            </div>
+          )}
+          <div className="p-3 border-t border-border flex gap-2 flex-shrink-0 bg-white">
+            <input
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && sendChat()}
+              placeholder="Ask Priya anything…"
+              className="flex-1 bg-muted/40 border border-border rounded-xl px-3 py-2 text-xs font-body text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/40 transition-colors"
+            />
+            <button onClick={sendChat} disabled={chatLoading || !chatInput.trim()} className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center disabled:opacity-40 flex-shrink-0 hover:bg-primary/90 transition-colors">
+              <Send className="w-3.5 h-3.5 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  );
+}
 
                         {/* Color variant switcher */}
                         {selectedProduct && !analyzing && (
