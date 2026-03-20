@@ -111,20 +111,20 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
 // ─── Loading Overlay ──────────────────────────────────────────────────────────
 function GeneratingOverlay() {
   return (
-    <div className="aspect-[3/4] rounded-2xl bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col items-center justify-center px-6">
-      <div className="relative mb-6">
-        <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-        <Sparkles className="absolute inset-0 m-auto w-7 h-7 text-primary animate-pulse" />
+    <div className="aspect-[3/4] rounded-[14px] bg-primary/4 border-2 border-dashed border-primary/15 flex flex-col items-center justify-center px-6">
+      <div className="relative mb-5">
+        <div className="w-14 h-14 rounded-full border-3 border-primary/15 border-t-primary animate-spin" style={{ borderWidth: "3px" }} />
+        <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-primary animate-pulse" />
       </div>
-      <p className="font-display text-lg font-semibold text-foreground text-center mb-2">
+      <p className="font-display text-lg font-medium text-foreground text-center mb-1.5">
         ✨ Creating Your Virtual Look…
       </p>
       <p className="font-body text-sm text-muted-foreground text-center">
         This may take 3–5 seconds
       </p>
-      <div className="flex gap-1 mt-5">
-        {[0, 150, 300].map((d) => (
-          <span key={d} className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: `${d}ms` }} />
+      <div className="flex gap-1.5 mt-4">
+        {[0, 120, 240].map((d) => (
+          <span key={d} className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: `${d}ms` }} />
         ))}
       </div>
     </div>
@@ -138,19 +138,19 @@ function SuggestionCard({
   return (
     <div
       onClick={onSelect}
-      className={`flex-shrink-0 w-28 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 border-2 hover:scale-105 ${
-        current ? "border-primary shadow-brand" : "border-transparent hover:border-white/30"
+      className={`flex-shrink-0 w-24 rounded-[14px] overflow-hidden cursor-pointer transition-all duration-200 border-2 hover:scale-[1.04] ${
+        current ? "border-primary shadow-soft" : "border-transparent hover:border-primary/30"
       }`}
     >
       <div className="relative">
         <img src={product.image_url} alt={product.name} className="w-full aspect-[3/4] object-cover" />
         {current && (
-          <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 text-white drop-shadow" />
+          <div className="absolute inset-0 bg-primary/15 flex items-center justify-center">
+            <CheckCircle className="w-5 h-5 text-primary drop-shadow" />
           </div>
         )}
       </div>
-      <div className="p-1.5 bg-background/80">
+      <div className="p-1.5 bg-white border-t border-border">
         <p className="font-body text-xs text-foreground font-medium leading-tight line-clamp-1">{product.name}</p>
         <p className="font-body text-xs text-primary font-semibold">₹{product.price.toLocaleString()}</p>
       </div>
