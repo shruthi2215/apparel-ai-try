@@ -710,11 +710,11 @@ export default function TryOnPage() {
 
           {/* ── Step 3: Results ───────────────────────────────────────── */}
           {step === 3 && (
-            <div className="space-y-6">
-              <div className="grid lg:grid-cols-5 gap-6">
+            <div className="space-y-5">
+              <div className="grid lg:grid-cols-5 gap-5">
                 {/* LEFT: Try-On Image (3 cols) */}
                 <div className="lg:col-span-3 space-y-4">
-                  <div className="glass-card rounded-3xl p-5">
+                  <div className="bg-white rounded-[14px] border border-border p-5 shadow-soft">
                     {/* Result tabs */}
                     <div className="flex gap-2 mb-4">
                       <button
