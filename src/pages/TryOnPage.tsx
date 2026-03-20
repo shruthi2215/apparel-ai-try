@@ -1142,10 +1142,7 @@ export default function TryOnPage() {
   );
 }
 
-                        {/* Color variant switcher */}
-                        {selectedProduct && !analyzing && (
-                          <div className="mt-4">
-                            <p className="font-body text-xs text-muted-foreground mb-2 font-semibold">Try other colors</p>
+
                             <div className="flex gap-2 flex-wrap">
                               {selectedProduct.colors.map(c => (
                                 <button
