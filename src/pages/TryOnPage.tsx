@@ -308,16 +308,45 @@ export default function TryOnPage() {
     });
 
     // Hard error from the function itself (network / deploy issue)
-    if (error) throw new Error(error?.message);
+    if (error) {
+      // Check if the error body contains structured info
+      const errBody = typeof error === "object" ? error : null;
+      const message = errBody?.message || error?.message || "Try-on failed";
+      
+      // Credit or rate limit errors
+      if (message.includes("credits") || message.includes("402")) {
+        toast({
+          title: "AI Credits Needed",
+          description: "Please add AI credits in Settings → Workspace → Usage to enable virtual try-on.",
+          variant: "destructive",
+        });
+        throw new Error("credits_exhausted");
+      }
+      throw new Error(message);
+    }
 
-    // AI credits exhausted or rate-limited → composite clothing onto user photo client-side
-    if (data?.fallback || data?.error) {
+    // Validation failure (bad photo quality/pose)
+    if (data?.validationFailed) {
       toast({
-        title: "✨ Visual Try-On Mode",
-        description: `AI generation is in demo mode — applying ${product.name} overlay on your photo.`,
+        title: "Photo Issue Detected",
+        description: data.error || "Please upload a clear front-facing photo for accurate try-on.",
+        variant: "destructive",
       });
-      // compositeCanvasTryOn overlays the clothing image onto the user's uploaded photo
-      return compositeCanvasTryOn(userPhoto!, product.image_url);
+      throw new Error("validation_failed");
+    }
+
+    // Credit/rate errors returned as response body
+    if (data?.creditError || data?.rateLimited) {
+      toast({
+        title: data?.creditError ? "AI Credits Needed" : "Rate Limited",
+        description: data.error,
+        variant: "destructive",
+      });
+      throw new Error(data?.creditError ? "credits_exhausted" : "rate_limited");
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
     }
 
     return data.imageUrl;
