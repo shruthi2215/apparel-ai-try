@@ -174,97 +174,6 @@ function getSuggestions(current: typeof SAMPLE_PRODUCTS[0]) {
   return [...sameCategory, ...sharedTag, ...rest].slice(0, 8);
 }
 
-// ─── Canvas-based try-on compositing (fallback when AI unavailable) ───────────
-// Strategy: side-by-side split — user photo on left half, outfit photo on right half,
-// with a central "ghost" silhouette blending both so it reads as a try-on preview.
-function compositeCanvasTryOn(userSrc: string, clothingSrc: string): Promise<string> {
-  return new Promise((resolve) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) { resolve(userSrc); return; }
-
-    const userImg = new Image();
-    userImg.crossOrigin = "anonymous";
-    userImg.onload = () => {
-      // Fixed portrait canvas: 480×640
-      const W = 480;
-      const H = 640;
-      canvas.width = W;
-      canvas.height = H;
-
-      // ── 1. Draw user photo, scaled to fill entire canvas (cover)
-      const uAspect = userImg.naturalWidth / userImg.naturalHeight;
-      const cAspect = W / H;
-      let sx = 0, sy = 0, sw = userImg.naturalWidth, sh = userImg.naturalHeight;
-      if (uAspect > cAspect) {
-        sw = userImg.naturalHeight * cAspect;
-        sx = (userImg.naturalWidth - sw) / 2;
-      } else {
-        sh = userImg.naturalWidth / cAspect;
-        sy = (userImg.naturalHeight - sh) / 2;
-      }
-      ctx.drawImage(userImg, sx, sy, sw, sh, 0, 0, W, H);
-
-      const clothingImg = new Image();
-      clothingImg.crossOrigin = "anonymous";
-      clothingImg.onload = () => {
-        // ── 2. Dim the user photo slightly so outfit overlay pops
-        ctx.fillStyle = "rgba(255,255,255,0.18)";
-        ctx.fillRect(0, 0, W, H);
-
-        // ── 3. Crop clothing image: skip top 22% (model's head) to focus on outfit
-        const skipHead = 0.22;
-        const cImgH = clothingImg.naturalHeight;
-        const cImgW = clothingImg.naturalWidth;
-        const srcY = cImgH * skipHead;
-        const srcH = cImgH * (1 - skipHead);
-
-        // Target region on canvas: full width, torso down (y: 18% → 100%)
-        const destX = 0;
-        const destY = Math.round(H * 0.18);
-        const destW = W;
-        const destH = H - destY;
-
-        // ── 4. Overlay the outfit portion using 'multiply' blend for fabric realism
-        ctx.save();
-        ctx.globalCompositeOperation = "multiply";
-        ctx.globalAlpha = 0.72;
-        ctx.drawImage(clothingImg, 0, srcY, cImgW, srcH, destX, destY, destW, destH);
-        ctx.restore();
-
-        // ── 5. Second pass: normal blend at low alpha for color pop
-        ctx.save();
-        ctx.globalCompositeOperation = "source-over";
-        ctx.globalAlpha = 0.28;
-        ctx.drawImage(clothingImg, 0, srcY, cImgW, srcH, destX, destY, destW, destH);
-        ctx.restore();
-
-        // ── 6. Soft gradient at top to preserve face naturally
-        const faceGrad = ctx.createLinearGradient(0, 0, 0, H * 0.2);
-        faceGrad.addColorStop(0, "rgba(255,255,255,0.0)");
-        faceGrad.addColorStop(1, "rgba(255,255,255,0.0)");
-        ctx.fillStyle = faceGrad;
-        ctx.fillRect(0, 0, W, H * 0.2);
-
-        // ── 7. Subtle vignette edges for a polished look
-        const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.75);
-        vig.addColorStop(0, "rgba(0,0,0,0)");
-        vig.addColorStop(1, "rgba(0,0,0,0.22)");
-        ctx.fillStyle = vig;
-        ctx.fillRect(0, 0, W, H);
-
-        resolve(canvas.toDataURL("image/jpeg", 0.93));
-      };
-      clothingImg.onerror = () => resolve(userSrc);
-      clothingImg.src = clothingSrc.includes("?")
-        ? clothingSrc + "&cb=" + Date.now()
-        : clothingSrc + "?cb=" + Date.now();
-    };
-    userImg.onerror = () => resolve(userSrc);
-    userImg.src = userSrc;
-  });
-}
-
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function TryOnPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -399,16 +308,45 @@ export default function TryOnPage() {
     });
 
     // Hard error from the function itself (network / deploy issue)
-    if (error) throw new Error(error?.message);
+    if (error) {
+      // Check if the error body contains structured info
+      const errBody = typeof error === "object" ? error : null;
+      const message = errBody?.message || error?.message || "Try-on failed";
+      
+      // Credit or rate limit errors
+      if (message.includes("credits") || message.includes("402")) {
+        toast({
+          title: "AI Credits Needed",
+          description: "Please add AI credits in Settings → Workspace → Usage to enable virtual try-on.",
+          variant: "destructive",
+        });
+        throw new Error("credits_exhausted");
+      }
+      throw new Error(message);
+    }
 
-    // AI credits exhausted or rate-limited → composite clothing onto user photo client-side
-    if (data?.fallback || data?.error) {
+    // Validation failure (bad photo quality/pose)
+    if (data?.validationFailed) {
       toast({
-        title: "✨ Visual Try-On Mode",
-        description: `AI generation is in demo mode — applying ${product.name} overlay on your photo.`,
+        title: "Photo Issue Detected",
+        description: data.error || "Please upload a clear front-facing photo for accurate try-on.",
+        variant: "destructive",
       });
-      // compositeCanvasTryOn overlays the clothing image onto the user's uploaded photo
-      return compositeCanvasTryOn(userPhoto!, product.image_url);
+      throw new Error("validation_failed");
+    }
+
+    // Credit/rate errors returned as response body
+    if (data?.creditError || data?.rateLimited) {
+      toast({
+        title: data?.creditError ? "AI Credits Needed" : "Rate Limited",
+        description: data.error,
+        variant: "destructive",
+      });
+      throw new Error(data?.creditError ? "credits_exhausted" : "rate_limited");
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
     }
 
     return data.imageUrl;
