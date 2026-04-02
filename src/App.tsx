@@ -12,6 +12,7 @@ import ProductsPage from "./pages/ProductsPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import HowItWorksPage from "./pages/HowItWorksPage.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 
 const queryClient = new QueryClient();
 
