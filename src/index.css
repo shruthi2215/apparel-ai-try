@@ -65,6 +65,17 @@
     --gradient-soft: linear-gradient(135deg, hsl(330 30% 96%), hsl(270 30% 94%), hsl(155 25% 94%));
     --gradient-shimmer: linear-gradient(90deg, transparent, hsl(43 65% 58% / 0.25), transparent);
 
+    /* Hero futuristic palette */
+    --hero-bg: 240 25% 8%;
+    --hero-surface: 240 20% 12%;
+    --hero-text: 0 0% 96%;
+    --hero-muted: 240 10% 60%;
+    --hero-accent: 260 80% 65%;
+    --hero-glow: 220 90% 55%;
+    --gradient-hero-bg: linear-gradient(145deg, hsl(240 30% 8%), hsl(260 35% 12%), hsl(220 40% 10%));
+    --gradient-hero-accent: linear-gradient(135deg, hsl(260 80% 65%), hsl(220 90% 55%));
+    --gradient-hero-glow: radial-gradient(ellipse at 50% 0%, hsl(260 80% 65% / 0.15) 0%, transparent 60%);
+
     /* Shadows — very soft */
     --shadow-xs: 0 1px 4px hsl(240 10% 40% / 0.06);
     --shadow-sm: 0 2px 8px hsl(240 10% 40% / 0.08);
