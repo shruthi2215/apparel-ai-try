@@ -67,7 +67,7 @@ export default function PricingSection() {
                 } : undefined}
                 whileHover={{ y: -8, scale: 1.03, boxShadow: "0 24px 60px hsl(var(--hero-accent) / 0.15)" }}
                 transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                style2={{ transformStyle: "preserve-3d" }}
+                
               >
                 {plan.highlighted && (
                   <motion.div
