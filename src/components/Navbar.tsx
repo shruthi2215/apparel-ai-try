@@ -29,12 +29,8 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4">
         <motion.div
-          className="rounded-2xl px-5 py-3 flex items-center justify-between"
-          style={{
-            background: "hsl(240 20% 4% / 0.7)",
-            backdropFilter: "blur(20px) saturate(1.6)",
-            border: "1px solid hsl(0 0% 100% / 0.06)",
-          }}
+          className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl px-5 py-3 flex items-center justify-between shadow-sm"
+          style={{ backdropFilter: "blur(20px) saturate(1.8)" }}
         >
           {/* Logo */}
           <motion.button
@@ -43,11 +39,11 @@ export default function Navbar() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-hero flex items-center justify-center shadow-gold">
-              <Sparkles className="w-4 h-4 text-foreground" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-hero flex items-center justify-center shadow-soft">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="font-display text-xl font-semibold text-foreground tracking-tight">
-              Try On <span className="gradient-text">Me</span>
+              Try On <span className="gradient-gold-text">Me</span>
             </span>
           </motion.button>
 
@@ -67,8 +63,7 @@ export default function Navbar() {
                 {link.label}
                 {location.pathname === link.href && (
                   <motion.div
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
-                    style={{ background: "var(--gradient-hero-accent)" }}
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
                     layoutId="nav-indicator"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
@@ -86,7 +81,7 @@ export default function Navbar() {
                   onClick={() => navigate("/profile")}
                   className="font-body text-muted-foreground hover:text-foreground text-sm gap-2 h-9"
                 >
-                  <div className="w-6 h-6 rounded-full bg-gradient-hero flex items-center justify-center text-foreground text-xs font-semibold">
+                  <div className="w-6 h-6 rounded-full bg-gradient-hero flex items-center justify-center text-white text-xs font-semibold">
                     {(profile?.display_name || user.email || "U")[0].toUpperCase()}
                   </div>
                   {profile?.display_name?.split(" ")[0] || "Profile"}
@@ -94,12 +89,7 @@ export default function Navbar() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     onClick={() => navigate("/try-on")}
-                    className="font-body text-sm px-5 h-9 rounded-full border-0 transition-all"
-                    style={{
-                      background: "var(--gradient-hero-accent)",
-                      color: "hsl(0 0% 100%)",
-                      boxShadow: "0 0 20px hsl(var(--hero-accent) / 0.3)",
-                    }}
+                    className="bg-primary text-primary-foreground font-body text-sm px-5 h-9 rounded-full border-0 hover:bg-primary/90 transition-all shadow-soft"
                   >
                     <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Try On Now
                   </Button>
@@ -117,12 +107,7 @@ export default function Navbar() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     onClick={() => navigate("/auth")}
-                    className="font-body text-sm px-5 h-9 rounded-full border-0 transition-all"
-                    style={{
-                      background: "var(--gradient-hero-accent)",
-                      color: "hsl(0 0% 100%)",
-                      boxShadow: "0 0 20px hsl(var(--hero-accent) / 0.3)",
-                    }}
+                    className="bg-primary text-primary-foreground font-body text-sm px-5 h-9 rounded-full border-0 hover:bg-primary/90 transition-all shadow-soft"
                   >
                     Get Started
                   </Button>
@@ -141,12 +126,7 @@ export default function Navbar() {
         <AnimatePresence>
           {open && (
             <motion.div
-              className="md:hidden mt-2 rounded-2xl px-5 py-5 flex flex-col gap-1 overflow-hidden"
-              style={{
-                background: "hsl(240 20% 6% / 0.95)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid hsl(0 0% 100% / 0.06)",
-              }}
+              className="md:hidden mt-2 bg-white/90 backdrop-blur-xl border border-white/40 rounded-2xl px-5 py-5 flex flex-col gap-1 shadow-md overflow-hidden"
               initial={{ opacity: 0, y: -10, height: 0 }}
               animate={{ opacity: 1, y: 0, height: "auto" }}
               exit={{ opacity: 0, y: -10, height: 0 }}
@@ -179,8 +159,7 @@ export default function Navbar() {
                   )}
                   <Button
                     onClick={() => navigate("/try-on")}
-                    className="font-body rounded-full border-0 mt-3"
-                    style={{ background: "var(--gradient-hero-accent)", color: "hsl(0 0% 100%)" }}
+                    className="bg-primary text-primary-foreground font-body rounded-full border-0 mt-3"
                   >
                     <Sparkles className="w-4 h-4 mr-2" /> Try On Now
                   </Button>
@@ -195,8 +174,7 @@ export default function Navbar() {
               ) : (
                 <Button
                   onClick={() => handleNav("/auth")}
-                  className="font-body rounded-full border-0 mt-3"
-                  style={{ background: "var(--gradient-hero-accent)", color: "hsl(0 0% 100%)" }}
+                  className="bg-primary text-primary-foreground font-body rounded-full border-0 mt-3"
                 >
                   Get Started Free
                 </Button>
