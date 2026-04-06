@@ -3,17 +3,31 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 const plans = [
-  { icon: Zap, name: "Starter", price: "₹2,999", period: "/month", description: "Perfect for small boutiques and WhatsApp sellers", features: ["Up to 500 try-ons/month", "50 product catalog", "Basic body detection", "WhatsApp integration", "Email support"], cta: "Get Started", highlighted: false, cardClass: "bg-white/80 backdrop-blur-md border-white/40", iconBg: "bg-primary/10", iconColor: "text-primary", checkBg: "bg-primary/10", checkColor: "text-primary", btnClass: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border-0" },
-  { icon: Crown, name: "Growth", price: "₹9,999", period: "/month", description: "For growing fashion brands scaling online", features: ["Up to 5,000 try-ons/month", "Unlimited catalog", "3D try-on visualization", "Shopify & Meesho integration", "Mix & match feature", "Priority support"], cta: "Start Free Trial", highlighted: true, cardClass: "bg-gradient-hero border-0 text-white", iconBg: "bg-white/20", iconColor: "text-white", checkBg: "bg-white/20", checkColor: "text-white", btnClass: "bg-white text-primary hover:bg-gold-light hover:text-gold-dark border-0" },
-  { icon: Building2, name: "Enterprise", price: "Custom", period: "", description: "For large brands, marketplaces & fashion platforms", features: ["Unlimited try-ons", "Full API access", "Custom AI model training", "Amazon & Flipkart integration", "Data insights dashboard", "Dedicated account manager"], cta: "Contact Sales", highlighted: false, cardClass: "bg-white/80 backdrop-blur-md border-white/40", iconBg: "bg-gold/12", iconColor: "text-gold-dark", checkBg: "bg-gold/10", checkColor: "text-gold-dark", btnClass: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border-0" },
+  {
+    icon: Zap, name: "Starter", price: "₹2,999", period: "/month",
+    description: "Perfect for small boutiques and sellers",
+    features: ["Up to 500 try-ons/month", "50 product catalog", "Basic body detection", "WhatsApp integration", "Email support"],
+    cta: "Get Started", highlighted: false,
+  },
+  {
+    icon: Crown, name: "Growth", price: "₹9,999", period: "/month",
+    description: "For growing fashion brands scaling online",
+    features: ["Up to 5,000 try-ons/month", "Unlimited catalog", "3D try-on visualization", "Shopify & Meesho integration", "Mix & match feature", "Priority support"],
+    cta: "Start Free Trial", highlighted: true,
+  },
+  {
+    icon: Building2, name: "Enterprise", price: "Custom", period: "",
+    description: "For large brands & fashion platforms",
+    features: ["Unlimited try-ons", "Full API access", "Custom AI model training", "Amazon & Flipkart integration", "Data insights dashboard", "Dedicated account manager"],
+    cta: "Contact Sales", highlighted: false,
+  },
 ];
 
 export default function PricingSection() {
   return (
-    <section className="py-24 bg-muted/30 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-      <div className="absolute -bottom-16 left-1/4 w-72 h-72 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
-      <div className="absolute -top-16 right-1/4 w-56 h-56 rounded-full bg-gold/6 blur-3xl pointer-events-none" />
+    <section className="py-24 bg-background relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-px" style={{ background: "linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.06), transparent)" }} />
+      <div className="absolute -bottom-16 left-1/4 w-72 h-72 rounded-full blur-[120px] pointer-events-none" style={{ background: "hsl(var(--hero-accent) / 0.04)" }} />
 
       <div className="container mx-auto px-4">
         <motion.div
@@ -24,9 +38,8 @@ export default function PricingSection() {
           transition={{ duration: 0.6 }}
         >
           <span className="pill-mint mb-5 inline-flex">Pricing Plans</span>
-          <h2 className="font-display text-4xl lg:text-5xl font-medium text-foreground mb-4 text-balance">
-            Simple, Transparent<br />
-            <span className="gradient-text">Pricing for Every Brand</span>
+          <h2 className="font-display text-4xl lg:text-5xl font-bold text-foreground mb-4 text-balance">
+            Simple, Transparent <span className="gradient-text">Pricing</span>
           </h2>
           <p className="font-body text-muted-foreground text-base max-w-lg mx-auto">
             Start free. Scale as you grow. No hidden charges.
@@ -43,14 +56,27 @@ export default function PricingSection() {
               transition={{ delay: i * 0.15, duration: 0.6, type: "spring", stiffness: 70 }}
             >
               <motion.div
-                className={`relative rounded-[14px] p-6 flex flex-col border ${plan.cardClass} ${plan.highlighted ? "shadow-lg" : "shadow-sm"} h-full`}
-                whileHover={{ y: -8, scale: 1.03, rotateY: plan.highlighted ? 0 : (i === 0 ? 3 : -3), boxShadow: "0 24px 60px hsl(240 10% 40% / 0.15)" }}
+                className={`relative rounded-2xl p-6 flex flex-col h-full ${
+                  plan.highlighted
+                    ? "animate-glow-border"
+                    : "glass-card"
+                }`}
+                style={plan.highlighted ? {
+                  background: "linear-gradient(145deg, hsl(260 30% 15%), hsl(240 25% 10%))",
+                  border: "1px solid hsl(var(--hero-accent) / 0.3)",
+                } : undefined}
+                whileHover={{ y: -8, scale: 1.03, boxShadow: "0 24px 60px hsl(var(--hero-accent) / 0.15)" }}
                 transition={{ type: "spring", stiffness: 180, damping: 20 }}
-                style={{ transformStyle: "preserve-3d" }}
+                
               >
                 {plan.highlighted && (
                   <motion.div
-                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 bg-gold rounded-full text-white text-xs font-body font-semibold tracking-wide whitespace-nowrap shadow-gold"
+                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-body font-semibold tracking-wide whitespace-nowrap"
+                    style={{
+                      background: "var(--gradient-hero-accent)",
+                      color: "hsl(0 0% 100%)",
+                      boxShadow: "0 0 20px hsl(var(--hero-accent) / 0.4)",
+                    }}
                     initial={{ opacity: 0, y: -10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -60,32 +86,43 @@ export default function PricingSection() {
                   </motion.div>
                 )}
 
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-5 ${plan.iconBg}`}>
-                  <plan.icon className={`w-5 h-5 ${plan.iconColor}`} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-5" style={{ background: "hsl(var(--hero-accent) / 0.1)" }}>
+                  <plan.icon className="w-5 h-5" style={{ color: "hsl(var(--hero-accent))" }} />
                 </div>
 
-                <p className={`font-body text-xs font-semibold tracking-widest uppercase mb-1 ${plan.highlighted ? "text-white/70" : "text-muted-foreground"}`}>
+                <p className="font-body text-xs font-semibold tracking-widest uppercase mb-1 text-muted-foreground">
                   {plan.name}
                 </p>
                 <div className="flex items-end gap-1 mb-2">
-                  <span className={`font-display text-3xl font-medium ${plan.highlighted ? "text-white" : "text-foreground"}`}>{plan.price}</span>
-                  <span className={`font-body text-sm mb-0.5 ${plan.highlighted ? "text-white/60" : "text-muted-foreground"}`}>{plan.period}</span>
+                  <span className="font-display text-3xl font-bold text-foreground">{plan.price}</span>
+                  <span className="font-body text-sm mb-0.5 text-muted-foreground">{plan.period}</span>
                 </div>
-                <p className={`font-body text-xs mb-6 leading-relaxed ${plan.highlighted ? "text-white/70" : "text-muted-foreground"}`}>{plan.description}</p>
+                <p className="font-body text-xs mb-6 leading-relaxed text-muted-foreground">{plan.description}</p>
 
                 <ul className="space-y-2.5 mb-7 flex-1">
                   {plan.features.map((feat, j) => (
                     <li key={j} className="flex items-start gap-2.5">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${plan.checkBg}`}>
-                        <Check className={`w-2.5 h-2.5 ${plan.checkColor}`} />
+                      <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "hsl(var(--hero-accent) / 0.15)" }}>
+                        <Check className="w-2.5 h-2.5" style={{ color: "hsl(var(--hero-accent))" }} />
                       </div>
-                      <span className={`font-body text-xs leading-relaxed ${plan.highlighted ? "text-white/80" : "text-foreground/75"}`}>{feat}</span>
+                      <span className="font-body text-xs leading-relaxed text-muted-foreground">{feat}</span>
                     </li>
                   ))}
                 </ul>
 
                 <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                  <Button className={`w-full rounded-full font-body font-medium py-4 text-sm transition-all ${plan.btnClass}`}>
+                  <Button
+                    className="w-full rounded-full font-body font-medium py-4 text-sm transition-all border-0"
+                    style={plan.highlighted ? {
+                      background: "var(--gradient-hero-accent)",
+                      color: "hsl(0 0% 100%)",
+                      boxShadow: "0 0 20px hsl(var(--hero-accent) / 0.3)",
+                    } : {
+                      background: "hsl(0 0% 100% / 0.06)",
+                      color: "hsl(0 0% 80%)",
+                      border: "1px solid hsl(0 0% 100% / 0.1)",
+                    }}
+                  >
                     {plan.cta}
                   </Button>
                 </motion.div>
