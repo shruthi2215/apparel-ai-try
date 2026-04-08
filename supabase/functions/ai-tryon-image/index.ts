@@ -19,22 +19,31 @@ serve(async (req) => {
 
     const colorNote = selectedColor ? ` in ${selectedColor} color` : "";
 
-    const prompt = `You are a virtual fashion try-on engine. Your task is to edit this photo so the person appears to be wearing a "${productName}"${colorNote}.
+    const prompt = `You are a virtual fashion try-on engine. Edit this photo so the person appears to be wearing a "${productName}"${colorNote}.
 
-CRITICAL RULES — follow every one:
-1. PRESERVE THE PERSON EXACTLY: same face, skin tone, hair, body shape, pose, proportions, and background. Do NOT generate a new person or model.
-2. CLOTHING REPLACEMENT ONLY: Remove the person's current top/outfit and replace it with the "${productName}"${colorNote}. Only modify the clothing region — do NOT touch face, hands, arms skin, or background.
-3. BODY-AWARE FIT: The garment must follow the person's actual body contours:
+ABSOLUTE RULES — YOU MUST FOLLOW EVERY ONE:
+
+1. DO NOT GENERATE A NEW PERSON. The output must be the SAME person from the input photo.
+2. PRESERVE IDENTITY EXACTLY: same face, facial features, skin tone, skin color, hair, hair style, body shape, body proportions, pose, hand position, and background. ZERO changes to the person's appearance.
+3. CLOTHING REPLACEMENT ONLY: Remove ONLY the current top/outfit and replace it with the "${productName}"${colorNote}. Do NOT touch face, hands, arms, skin, or background.
+4. BODY-AWARE FIT:
    - Match shoulder width precisely
-   - Follow chest/waist/hip curves naturally  
+   - Follow chest/waist/hip curves naturally
    - Drape and fold realistically based on body shape and pose
    - Sleeve length and neckline should look anatomically correct
-4. FABRIC REALISM: Show natural fabric behavior — wrinkles at joints, gravity-based draping, proper creases. No flat or floating clothing.
-5. LIGHTING MATCH: The clothing must match the photo's existing lighting direction, shadows, and color temperature. Add natural shadow under collar, at folds, and where fabric meets skin.
-6. SEAMLESS EDGES: No visible cut lines, sharp edges, or halo artifacts where clothing meets skin or background.
-7. OUTPUT: Photorealistic result that looks like the person actually wore this garment for the photo — NOT a composite or overlay.
+5. INDIAN ETHNIC WEAR HANDLING:
+   - For Sarees: Show proper pleats at the waist, pallu draped over shoulder, natural fabric folds, proper blouse fitting
+   - For Kurtis: Show proper length, side slits if applicable, dupatta if mentioned
+   - For Lehengas: Show full flare, proper waistband, natural fabric weight and movement
+   - For Shirts/Pants: Standard Western fitting with proper collar, buttons, and creases
+6. FABRIC REALISM: Show natural fabric behavior — wrinkles at joints, gravity-based draping, proper creases. No flat or floating clothing.
+7. LIGHTING MATCH: The clothing MUST match the photo's existing lighting direction, shadows, and color temperature. Add natural shadow under collar, at folds, and where fabric meets skin.
+8. SEAMLESS EDGES: No visible cut lines, sharp edges, halo artifacts, or color bleeding where clothing meets skin or background.
+9. OUTPUT: Photorealistic result that looks like the person actually wore this garment for the photo — NOT a composite, overlay, or pasted image.
 
-If the person is not in a clear front-facing pose or the image quality is too low for accurate try-on, respond with text only: "VALIDATION_FAILED: Please upload a clear front-facing photo with good lighting for accurate try-on results."`;
+CRITICAL REMINDER: Do not generate new people. Always preserve user identity and only apply clothing.
+
+If the person is not in a clear pose or the image quality is too low, respond with text only: "VALIDATION_FAILED: Please upload a clear front-facing photo with good lighting for accurate try-on results."`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -79,7 +88,6 @@ If the person is not in a clear front-facing pose or the image quality is too lo
     const message = data.choices?.[0]?.message;
     const textContent = message?.content || "";
 
-    // Check for validation failure
     if (textContent.includes("VALIDATION_FAILED")) {
       return new Response(
         JSON.stringify({ error: textContent.replace("VALIDATION_FAILED: ", ""), validationFailed: true }),
