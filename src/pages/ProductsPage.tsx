@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import TryOnModal from "@/components/TryOnModal";
 import {
-  Search, Heart, ShoppingCart, Sparkles, Star, Filter, TrendingUp
+  Search, Heart, ShoppingCart, Sparkles, Star, TrendingUp
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,6 +27,7 @@ export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  const [tryOnProduct, setTryOnProduct] = useState<typeof MOCK_PRODUCTS[0] | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -48,9 +49,9 @@ export default function ProductsPage() {
     });
   };
 
-  const handleTryOn = (productId: string) => {
+  const handleTryOn = (product: typeof MOCK_PRODUCTS[0]) => {
     if (!user) { navigate("/auth"); return; }
-    navigate(`/try-on?product=${productId}`);
+    setTryOnProduct(product);
   };
 
   return (
@@ -66,7 +67,7 @@ export default function ProductsPage() {
             <p className="font-body text-muted-foreground text-lg">Explore our curated fashion collection for all occasions</p>
           </div>
 
-          {/* Search + Filter */}
+          {/* Search */}
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -96,7 +97,6 @@ export default function ProductsPage() {
             ))}
           </div>
 
-          {/* Trending badge */}
           {activeCategory === "All" && (
             <div className="flex items-center gap-2 mb-6">
               <TrendingUp className="w-4 h-4 text-primary" />
@@ -104,8 +104,8 @@ export default function ProductsPage() {
             </div>
           )}
 
-          {/* Product Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {/* Product Grid - vertical layout, mobile friendly */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
             {filtered.map((product) => (
               <div key={product.id} className="glass-card rounded-2xl overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                 <div className="relative aspect-[3/4] overflow-hidden">
@@ -141,13 +141,14 @@ export default function ProductsPage() {
                       <span className="font-body text-xs line-through text-muted-foreground">₹{product.original_price.toLocaleString()}</span>
                     )}
                   </div>
+                  {/* Try On Me button */}
                   <Button
-                    onClick={() => handleTryOn(product.id)}
+                    onClick={() => handleTryOn(product)}
                     className="w-full h-9 text-xs bg-gradient-hero text-white border-0 rounded-lg font-body font-semibold hover:scale-105 transition-transform shadow-brand"
                   >
                     <Sparkles className="w-3 h-3 mr-1.5" /> Try On Me
                   </Button>
-                  <div className="flex gap-2 mt-1.5">
+                  <div className="flex flex-col sm:flex-row gap-1.5 mt-1.5">
                     <Button
                       variant="outline"
                       className="flex-1 h-7 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
@@ -156,8 +157,7 @@ export default function ProductsPage() {
                     </Button>
                     <Button
                       variant="outline"
-                      className="h-7 px-3 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
-                      onClick={() => handleTryOn(product.id)}
+                      className="flex-1 h-7 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
                     >
                       Buy Now
                     </Button>
@@ -174,6 +174,16 @@ export default function ProductsPage() {
           )}
         </div>
       </div>
+
+      {/* Try-On Modal */}
+      {tryOnProduct && (
+        <TryOnModal
+          open={!!tryOnProduct}
+          onClose={() => setTryOnProduct(null)}
+          product={tryOnProduct}
+        />
+      )}
+
       <Footer />
     </div>
   );
