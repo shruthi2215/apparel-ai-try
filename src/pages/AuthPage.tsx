@@ -64,7 +64,9 @@ export default function AuthPage() {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Welcome back!" });
-      navigate("/");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) await redirectByRole(user.id, navigate);
+      else navigate("/");
     }
     setLoading(false);
   };
@@ -146,7 +148,7 @@ export default function AuthPage() {
           setStep("create_account");
         } else {
           toast({ title: "Welcome back!" });
-          navigate("/");
+          await redirectByRole(data.user.id, navigate);
         }
       }
     }
@@ -182,7 +184,8 @@ export default function AuthPage() {
       }).eq("user_id", user.id);
     }
     toast({ title: "Account created!" });
-    navigate("/");
+    if (user) await redirectByRole(user.id, navigate);
+    else navigate("/");
     setLoading(false);
   };
 
