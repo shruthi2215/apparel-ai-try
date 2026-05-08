@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Sparkles, Eye, EyeOff, ArrowLeft, Phone, Lock, User, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { redirectByRole } from "@/lib/redirectByRole";
 
 type AuthMode = "login" | "signup" | "forgot_password";
 type LoginMethod = "email" | "phone";
