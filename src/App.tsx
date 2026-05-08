@@ -11,6 +11,7 @@ import TryOnPage from "./pages/TryOnPage.tsx";
 import ProductsPage from "./pages/ProductsPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
+import SuperAdminPage from "./pages/SuperAdminPage.tsx";
 import HowItWorksPage from "./pages/HowItWorksPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/admin" element={<AdminPage />} />
+            <Route path="/super-admin" element={<SuperAdminPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
