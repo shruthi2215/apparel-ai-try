@@ -16,6 +16,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
+  const { isSuperAdmin, isAdmin } = useAuth();
 
   const handleNav = (href: string) => { navigate(href); setOpen(false); };
   const handleSignOut = async () => { await signOut(); navigate("/"); setOpen(false); };
@@ -155,6 +156,14 @@ export default function Navbar() {
                       className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left"
                     >
                       Admin Dashboard
+                    </button>
+                  )}
+                  {isSuperAdmin && (
+                    <button
+                      onClick={() => handleNav("/super-admin")}
+                      className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left"
+                    >
+                      Super Admin Console
                     </button>
                   )}
                   <Button
