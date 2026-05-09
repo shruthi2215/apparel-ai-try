@@ -127,6 +127,15 @@ export default function ProductsPage() {
                   >
                     <Heart className="w-4 h-4" fill={wishlist.has(product.id) ? "currentColor" : "none"} />
                   </button>
+
+                  {/* Floating "Try it on" pill button overlay (like marketplace integrations) */}
+                  <button
+                    onClick={() => handleTryOn(product)}
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-slate-900 text-xs font-body font-semibold shadow-lg hover:scale-105 transition-transform whitespace-nowrap"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-primary" />
+                    Try it on
+                  </button>
                 </div>
                 <div className="p-3">
                   <p className="font-body text-xs text-muted-foreground mb-0.5">{product.brand}</p>
