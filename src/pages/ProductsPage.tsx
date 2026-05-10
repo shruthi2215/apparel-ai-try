@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
@@ -28,14 +29,42 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [tryOnProduct, setTryOnProduct] = useState<typeof MOCK_PRODUCTS[0] | null>(null);
+  const [dbProducts, setDbProducts] = useState<typeof MOCK_PRODUCTS>([]);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const filtered = MOCK_PRODUCTS.filter((p) => {
+  useEffect(() => {
+    supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        const mapped = (data || []).map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          category: p.category,
+          price: Number(p.price) || 0,
+          original_price: p.original_price ? Number(p.original_price) : undefined,
+          brand: p.brand || "—",
+          rating: Number(p.rating) || 0,
+          reviews_count: p.reviews_count || 0,
+          is_trending: !!p.is_trending,
+          in_stock: !!p.in_stock,
+          colors: p.colors || [],
+          sizes: p.sizes || [],
+          image_url: p.image_url || "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&h=500&fit=crop",
+          tags: p.tags || [],
+        })) as typeof MOCK_PRODUCTS;
+        setDbProducts(mapped);
+      });
+  }, []);
+
+  const ALL_PRODUCTS = [...dbProducts, ...MOCK_PRODUCTS];
+  const filtered = ALL_PRODUCTS.filter((p) => {
     const matchCat = activeCategory === "All" || p.category === activeCategory;
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.brand.toLowerCase().includes(search.toLowerCase());
+      (p.brand || "").toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
