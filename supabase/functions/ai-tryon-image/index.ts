@@ -37,38 +37,54 @@ serve(async (req) => {
 
     const colorNote = selectedColor ? ` (color variant: ${selectedColor})` : "";
 
-    const prompt = `You are a virtual try-on engine performing GARMENT TRANSFER, not text-to-image generation.
+    const prompt = `OBJECTIVE: Perform STRICT GARMENT TRANSFER from IMAGE 2 (product) onto IMAGE 1 (user) with PIXEL-LEVEL FIDELITY. This is NOT text-to-image generation. The garment must remain IDENTICAL to IMAGE 2.
 
-You receive TWO images:
-  IMAGE 1 = the PERSON photo (the user). Preserve everything about this person.
-  IMAGE 2 = the EXACT PRODUCT garment "${productName}"${colorNote}, category: ${productCategory || "garment"}. This is the GROUND TRUTH for the clothing.
+INPUTS:
+  IMAGE 1 → User photo. Preserve face, body, pose, hands, hair, skin tone, background.
+  IMAGE 2 → Product garment "${productName}"${colorNote} (category: ${productCategory || "garment"}). HARD REFERENCE LOCK — ground truth for the clothing.
 
-TASK: Transfer the garment from IMAGE 2 onto the person in IMAGE 1. The output must look like the same person from IMAGE 1 wearing the EXACT garment shown in IMAGE 2.
+CORE INSTRUCTION:
+Transfer the garment from IMAGE 2 onto the person in IMAGE 1. Output = same person from IMAGE 1 wearing the EXACT garment from IMAGE 2 — not a similar one, not a reinterpretation, not a "better" version.
 
-ABSOLUTE RULES — VIOLATIONS = FAILURE:
+STRICT RULES (NON-NEGOTIABLE — VIOLATIONS = FAILURE):
+- DO NOT redesign, restyle, or reinterpret the garment.
+- DO NOT change color, shade, pattern, print, motifs, embroidery, or texture.
+- DO NOT modify sleeve type, sleeve length, neckline, garment length, silhouette, or trims.
+- DO NOT generate a "similar" outfit — it must be the SAME outfit pixel-for-pixel.
+- DO NOT add, remove, or rearrange embellishments, buttons, zippers, borders, or dupattas.
 
-1. PRODUCT FIDELITY (HIGHEST PRIORITY) — The garment in the output MUST match IMAGE 2 EXACTLY:
-   - Same color and exact shade (no shifts, no "similar" tones)
-   - Same print, pattern, motifs, embroidery placement
-   - Same neckline shape, sleeve length and style, garment length, silhouette
-   - Same fabric texture, sheen, and material appearance
-   - Same trims, borders, buttons, zippers, embellishments
-   DO NOT redesign, restyle, or "improve" the garment. DO NOT invent details. DO NOT substitute a similar-looking garment. If you cannot faithfully reproduce IMAGE 2, output the validation failure text below.
+TECHNICAL ENFORCEMENT:
+- Treat IMAGE 2 as a HARD CONDITIONING INPUT (reference lock, IP-Adapter style, high weight).
+- Apply a segmentation mask: replace ONLY the clothing region. Preserve face, skin, hair, hands, background.
+- Pose alignment: warp IMAGE 2's garment to the person's pose using shoulders, chest, waist, hips, arms.
+- Use LOW denoising strength (≤ 0.4) on the garment region — copy, do not regenerate.
+- Use reference-attention with HIGH weight on IMAGE 2.
 
-2. PERSON FIDELITY — Preserve from IMAGE 1: same face, facial features, skin tone, hair, body shape, pose, hand position, and background. ZERO identity changes.
+GARMENT PRESERVATION CONTROLS — LOCK:
+- Color histogram of IMAGE 2.
+- Texture patterns and weave of IMAGE 2.
+- Edge structure, neckline curve, sleeve cuffs, hemline of IMAGE 2.
+- Prevent any diffusion outside the garment mask.
 
-3. ONLY ADAPT: fit to body, drape on the actual pose, lighting/shadow match to IMAGE 1's environment. Nothing else.
+NEGATIVE PROMPT (avoid at all costs):
+"new design, different dress, altered pattern, color change, color shift, extra embroidery, missing embroidery, sleeve change, neckline change, length change, fashion variation, stylized clothing, similar outfit, reinterpretation, AI redesign".
 
-4. GARMENT TRANSFER METHOD: Treat this as image-to-image cloth warping. Warp the garment from IMAGE 2 onto the person's body using their pose (shoulders, chest, waist, hips). Blend edges naturally. Do not regenerate the garment from scratch.
+INDIAN ETHNIC WEAR DRAPING (apply only if applicable, NEVER altering color/print/structure of IMAGE 2):
+- Saree: pleats at waist, pallu over shoulder, natural folds — using the EXACT saree fabric from IMAGE 2.
+- Kurti / Anarkali: correct length, side slits, dupatta only if present in IMAGE 2.
+- Lehenga: full flare, proper waistband, natural weight, EXACT blouse and dupatta from IMAGE 2.
 
-5. INDIAN ETHNIC WEAR DRAPING (when applicable, but never altering color/print):
-   - Saree: pleats at waist, pallu over shoulder, natural folds — using the EXACT saree fabric from IMAGE 2.
-   - Kurti: correct length, side slits, dupatta if shown in IMAGE 2.
-   - Lehenga: full flare, proper waistband, natural weight.
+QUALITY: Photorealistic. No halos, no cut-out edges, no color bleeding, no floating fabric, no doubled limbs.
 
-6. NO HALOS, no cut-out edges, no color bleeding, no floating fabric. Photorealistic only.
+VALIDATION STEP (MANDATORY BEFORE RETURNING):
+Compare the generated garment vs IMAGE 2 on:
+  (a) color similarity, (b) pattern similarity, (c) shape/silhouette similarity.
+If ANY of these mismatch → REJECT the result.
 
-VALIDATION: If IMAGE 1 is not a clear front-facing person photo, OR if you cannot reproduce IMAGE 2's exact color/pattern/structure on the person, respond with TEXT ONLY: "VALIDATION_FAILED: Unable to generate accurate try-on for this product. Please try another image."`;
+FALLBACK: If IMAGE 1 is not a clear front-facing person photo, OR you cannot reproduce IMAGE 2's exact color/pattern/structure, respond with TEXT ONLY (no image):
+"VALIDATION_FAILED: Unable to generate accurate try-on for this product. Please try another image."
+
+SUCCESS CONDITION: The user must be able to say — "This is the EXACT same dress I selected, just on my body."`;
 
     const userContent: any[] = [
       { type: "text", text: prompt },
