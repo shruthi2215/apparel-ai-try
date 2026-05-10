@@ -173,6 +173,8 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
         body: {
           userImageBase64: userPhoto,
           productName: product.name,
+          productImageUrl: product.image_url,
+          productCategory: product.category,
           selectedColor: useColor,
           userPhotoMimeType: userPhotoFile?.type || "image/jpeg",
         },
