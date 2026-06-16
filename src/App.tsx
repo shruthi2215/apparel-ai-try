@@ -14,6 +14,7 @@ import AdminPage from "./pages/AdminPage.tsx";
 import SuperAdminPage from "./pages/SuperAdminPage.tsx";
 import HowItWorksPage from "./pages/HowItWorksPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
+import IndrajaPage from "./pages/IndrajaPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/super-admin" element={<SuperAdminPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/indraja" element={<IndrajaPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
