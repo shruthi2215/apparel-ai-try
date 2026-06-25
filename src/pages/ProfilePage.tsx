@@ -20,7 +20,7 @@ const TABS = [
 ];
 
 export default function ProfilePage() {
-  const { user, profile, signOut, refreshProfile } = useAuth();
+  const { user, profile, signOut, refreshProfile, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
@@ -96,14 +96,14 @@ export default function ProfilePage() {
                 {profile?.display_name || "User"}
               </h1>
               <p className="font-body text-sm text-muted-foreground">{user.email}</p>
-              {profile?.is_admin && (
+              {isAdmin && (
                 <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-gold/20 text-gold text-xs font-body font-semibold">
                   Admin
                 </span>
               )}
             </div>
             <div className="flex gap-3">
-              {profile?.is_admin && (
+              {isAdmin && (
                 <Button
                   onClick={() => navigate("/admin")}
                   variant="outline"
