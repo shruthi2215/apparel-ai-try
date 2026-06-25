@@ -150,7 +150,7 @@ export default function Navbar() {
                   >
                     <User className="w-4 h-4" /> My Profile
                   </button>
-                  {profile?.is_admin && (
+                  {isAdmin && (
                     <button
                       onClick={() => handleNav("/admin")}
                       className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left"
