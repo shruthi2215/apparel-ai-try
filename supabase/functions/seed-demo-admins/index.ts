@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
 
     // Ensure profile exists
     await supabase.from("profiles").upsert(
-      { user_id: userId, display_name: a.name, is_admin: true },
+      { user_id: userId, display_name: a.name },
       { onConflict: "user_id" }
     );
 

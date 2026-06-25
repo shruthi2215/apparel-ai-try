@@ -19,7 +19,7 @@ const TABS = [
 ];
 
 export default function AdminPage() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -32,17 +32,17 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    if (!loading && (!user || !profile?.is_admin)) {
+    if (!loading && (!user || !isAdmin)) {
       navigate("/");
     }
-  }, [user, profile, loading]);
+  }, [user, profile, loading, isAdmin]);
 
   useEffect(() => {
-    if (!profile?.is_admin) return;
+    if (!isAdmin) return;
     supabase.from("products").select("*").order("created_at", { ascending: false }).then(({ data }) => setProducts(data || []));
     supabase.from("orders").select("*").order("created_at", { ascending: false }).then(({ data }) => setOrders(data || []));
     supabase.from("try_on_sessions").select("*").order("created_at", { ascending: false }).limit(100).then(({ data }) => setSessions(data || []));
-  }, [profile]);
+  }, [profile, isAdmin]);
 
   const addProduct = async () => {
     if (!newProduct.name || !newProduct.price) { toast({ title: "Name and price are required", variant: "destructive" }); return; }
@@ -70,7 +70,7 @@ export default function AdminPage() {
   };
 
   if (loading) return null;
-  if (!profile?.is_admin) return null;
+  if (!isAdmin) return null;
 
   const stats = [
     { label: "Total Products", value: products.length, icon: Package, color: "text-primary" },

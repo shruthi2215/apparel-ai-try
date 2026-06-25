@@ -13,7 +13,6 @@ interface Profile {
   body_weight_kg: number | null;
   skin_tone: string | null;
   preferred_fit: string | null;
-  is_admin: boolean;
 }
 
 export type AppRole = "super_admin" | "admin" | "user";
