@@ -15,6 +15,8 @@ import SuperAdminPage from "./pages/SuperAdminPage.tsx";
 import HowItWorksPage from "./pages/HowItWorksPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import IndrajaPage from "./pages/IndrajaPage.tsx";
+import MerchantDashboard from "./pages/MerchantDashboard.tsx";
+import ApiDocs from "./pages/ApiDocs.tsx";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/super-admin" element={<SuperAdminPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/merchant" element={<MerchantDashboard />} />
+            <Route path="/api-docs" element={<ApiDocs />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/indraja" element={<IndrajaPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
