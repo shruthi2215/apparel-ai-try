@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          merchant_id: string
+          name: string | null
+          revoked: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          merchant_id: string
+          name?: string | null
+          revoked?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          merchant_id?: string
+          name?: string | null
+          revoked?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchants: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_user_id: string
+          status: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_user_id: string
+          status?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_user_id?: string
+          status?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           color: string | null
@@ -224,6 +295,50 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tryon_requests: {
+        Row: {
+          created_at: string
+          error_code: string | null
+          id: string
+          latency_ms: number | null
+          merchant_id: string
+          product_id: string | null
+          product_name: string | null
+          request_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          latency_ms?: number | null
+          merchant_id: string
+          product_id?: string | null
+          product_name?: string | null
+          request_id: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          latency_ms?: number | null
+          merchant_id?: string
+          product_id?: string | null
+          product_name?: string | null
+          request_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tryon_requests_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
             referencedColumns: ["id"]
           },
         ]
