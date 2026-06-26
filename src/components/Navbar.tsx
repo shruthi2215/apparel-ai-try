@@ -9,6 +9,7 @@ const navLinks = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Products", href: "/products" },
   { label: "Virtual Try-On", href: "/try-on" },
+  { label: "For Developers", href: "/api-docs" },
 ];
 
 export default function Navbar() {
@@ -77,6 +78,13 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/merchant")}
+                  className="font-body text-muted-foreground hover:text-foreground text-sm h-9"
+                >
+                  Merchant
+                </Button>
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/profile")}
@@ -149,6 +157,12 @@ export default function Navbar() {
                     className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left flex items-center gap-2"
                   >
                     <User className="w-4 h-4" /> My Profile
+                  </button>
+                  <button
+                    onClick={() => handleNav("/merchant")}
+                    className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left"
+                  >
+                    Merchant Dashboard
                   </button>
                   {isAdmin && (
                     <button
