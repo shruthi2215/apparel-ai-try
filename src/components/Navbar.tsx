@@ -9,6 +9,7 @@ const navLinks = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Products", href: "/products" },
   { label: "Virtual Try-On", href: "/try-on" },
+  { label: "For Developers", href: "/api-docs" },
 ];
 
 export default function Navbar() {
