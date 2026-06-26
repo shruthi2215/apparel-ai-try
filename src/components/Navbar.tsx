@@ -80,6 +80,13 @@ export default function Navbar() {
               <>
                 <Button
                   variant="ghost"
+                  onClick={() => navigate("/merchant")}
+                  className="font-body text-muted-foreground hover:text-foreground text-sm h-9"
+                >
+                  Merchant
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => navigate("/profile")}
                   className="font-body text-muted-foreground hover:text-foreground text-sm gap-2 h-9"
                 >
