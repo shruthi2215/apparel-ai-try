@@ -158,6 +158,12 @@ export default function Navbar() {
                   >
                     <User className="w-4 h-4" /> My Profile
                   </button>
+                  <button
+                    onClick={() => handleNav("/merchant")}
+                    className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left"
+                  >
+                    Merchant Dashboard
+                  </button>
                   {isAdmin && (
                     <button
                       onClick={() => handleNav("/admin")}
