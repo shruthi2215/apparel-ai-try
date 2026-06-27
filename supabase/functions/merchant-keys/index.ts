@@ -45,7 +45,7 @@ serve(async (req) => {
   // Verify the user owns this merchant (or is super admin).
   const { data: merchant } = await admin
     .from("merchants")
-    .select("id, owner_user_id")
+    .select("id, owner_user_id, status")
     .eq("id", merchantId)
     .maybeSingle();
   if (!merchant) return json({ error: "Merchant not found" }, 404);
@@ -54,6 +54,37 @@ serve(async (req) => {
   const isSuperAdmin = (roleRows ?? []).some((r: any) => r.role === "super_admin");
   if (merchant.owner_user_id !== user.id && !isSuperAdmin) {
     return json({ error: "Forbidden" }, 403);
+  }
+
+  async function audit(action: string, targetId: string | null, metadata: Record<string, unknown> = {}) {
+    await admin.from("audit_logs").insert({
+      actor_user_id: user.id,
+      actor_email: user.email,
+      merchant_id: merchantId,
+      action,
+      target_type: "api_key",
+      target_id: targetId,
+      metadata,
+    });
+  }
+
+  async function mintKey(label: string) {
+    const rawKey = generateKey();
+    const keyHash = await sha256Hex(rawKey);
+    const keyPrefix = rawKey.slice(0, 12);
+    const { data, error } = await admin
+      .from("api_keys")
+      .insert({ merchant_id: merchantId, name: label, key_prefix: keyPrefix, key_hash: keyHash })
+      .select("id, name, key_prefix, created_at")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ...data, key: rawKey };
+  }
+
+  // API keys can only be issued once a merchant is approved (active).
+  const requiresActive = action === "create" || action === "rotate";
+  if (requiresActive && merchant.status !== "active") {
+    return json({ error: `Merchant must be approved before API keys can be issued (status: ${merchant.status}).` }, 403);
   }
 
   if (action === "create") {
@@ -66,13 +97,30 @@ serve(async (req) => {
       .select("id, name, key_prefix, created_at")
       .single();
     if (error) return json({ error: error.message }, 400);
+    await audit("api_key.created", data.id, { name: data.name });
     // Return the raw key ONCE — it is never stored or retrievable again.
     return json({ ...data, key: rawKey }, 200);
+  }
+
+  if (action === "rotate") {
+    if (!keyId) return json({ error: "keyId required" }, 400);
+    const { data: old } = await admin
+      .from("api_keys").select("id, name").eq("id", keyId).eq("merchant_id", merchantId).maybeSingle();
+    if (!old) return json({ error: "Key not found" }, 404);
+    try {
+      const minted = await mintKey(old.name || "Rotated key");
+      await admin.from("api_keys").update({ revoked: true }).eq("id", keyId).eq("merchant_id", merchantId);
+      await audit("api_key.rotated", minted.id, { rotated_from: keyId, name: minted.name });
+      return json(minted, 200);
+    } catch (e) {
+      return json({ error: e instanceof Error ? e.message : "Rotate failed" }, 400);
+    }
   }
 
   if (action === "revoke") {
     const { error } = await admin.from("api_keys").update({ revoked: true }).eq("id", keyId).eq("merchant_id", merchantId);
     if (error) return json({ error: error.message }, 400);
+    await audit("api_key.revoked", keyId ?? null, {});
     return json({ ok: true }, 200);
   }
 
