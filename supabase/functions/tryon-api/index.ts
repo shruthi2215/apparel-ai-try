@@ -9,11 +9,10 @@ const corsHeaders = {
 };
 
 // Very small in-memory rate limiter (per key, per instance).
-const RATE_LIMIT = 30; // requests
 const RATE_WINDOW_MS = 60_000; // per minute
 const buckets = new Map<string, { count: number; reset: number }>();
 
-function rateLimited(keyId: string): boolean {
+function rateLimited(keyId: string, limit: number): boolean {
   const now = Date.now();
   const b = buckets.get(keyId);
   if (!b || now > b.reset) {
@@ -21,7 +20,7 @@ function rateLimited(keyId: string): boolean {
     return false;
   }
   b.count++;
-  return b.count > RATE_LIMIT;
+  return b.count > limit;
 }
 
 function json(body: unknown, status: number) {
@@ -62,7 +61,7 @@ serve(async (req) => {
 
   const { data: merchant } = await admin
     .from("merchants")
-    .select("id, status")
+    .select("id, status, rate_limit_per_min, monthly_quota")
     .eq("id", keyRow.merchant_id)
     .maybeSingle();
 
@@ -71,9 +70,25 @@ serve(async (req) => {
     return json({ error: `Merchant account is ${merchant.status}.`, requestId, status: "failed" }, 403);
   }
 
-  // ---- Rate limiting ----
-  if (rateLimited(keyRow.id)) {
-    return json({ error: "Rate limit exceeded. Max 30 requests/min.", requestId, status: "failed" }, 429);
+  // ---- Rate limiting (per merchant configured limit) ----
+  const perMinLimit = merchant.rate_limit_per_min || 30;
+  if (rateLimited(keyRow.id, perMinLimit)) {
+    return json({ error: `Rate limit exceeded. Max ${perMinLimit} requests/min.`, requestId, status: "failed" }, 429);
+  }
+
+  // ---- Monthly quota enforcement ----
+  if (merchant.monthly_quota && merchant.monthly_quota > 0) {
+    const monthStart = new Date();
+    monthStart.setUTCDate(1);
+    monthStart.setUTCHours(0, 0, 0, 0);
+    const { count } = await admin
+      .from("tryon_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("merchant_id", merchant.id)
+      .gte("created_at", monthStart.toISOString());
+    if ((count ?? 0) >= merchant.monthly_quota) {
+      return json({ error: "Monthly quota exceeded. Upgrade your plan to continue.", requestId, status: "failed" }, 429);
+    }
   }
 
   // touch last_used_at (best effort)
