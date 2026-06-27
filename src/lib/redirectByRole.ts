@@ -8,5 +8,6 @@ export async function redirectByRole(userId: string, navigate: (path: string) =>
   const roles = (data || []).map((r) => r.role);
   if (roles.includes("super_admin")) navigate("/super-admin");
   else if (roles.includes("admin")) navigate("/admin");
+  else if (roles.includes("merchant") || roles.includes("staff")) navigate("/merchant");
   else navigate("/");
 }
