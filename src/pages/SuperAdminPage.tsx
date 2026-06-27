@@ -9,8 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 import {
   LayoutDashboard, Users, Shield, Package, ShoppingBag, BarChart3,
   TrendingUp, Activity, Ban, CheckCircle2, UserPlus, Trash2,
-  Search, ChevronLeft, ChevronRight,
+  Search, ChevronLeft, ChevronRight, Building2, CreditCard, ScrollText,
 } from "lucide-react";
+import MerchantsAdmin from "@/components/admin/MerchantsAdmin";
+import PlansAdmin from "@/components/admin/PlansAdmin";
+import AuditLogsAdmin from "@/components/admin/AuditLogsAdmin";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
@@ -20,10 +23,13 @@ type AppRole = "super_admin" | "admin" | "user";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "merchants", label: "Merchants", icon: Building2 },
+  { id: "plans", label: "Plans", icon: CreditCard },
   { id: "admins", label: "Admins", icon: Shield },
   { id: "users", label: "Users", icon: Users },
   { id: "products", label: "Products", icon: Package },
   { id: "orders", label: "Orders", icon: ShoppingBag },
+  { id: "logs", label: "Audit Logs", icon: ScrollText },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
 
@@ -283,6 +289,15 @@ export default function SuperAdminPage() {
               </div>
             </div>
           )}
+
+          {tab === "merchants" && <MerchantsAdmin />}
+          {tab === "plans" && (
+            <div className="space-y-4">
+              <p className="font-body text-sm text-muted-foreground">Edit pricing, quotas and visibility. Changes apply to new merchant subscriptions.</p>
+              <PlansAdmin />
+            </div>
+          )}
+          {tab === "logs" && <AuditLogsAdmin />}
 
           {tab === "admins" && (
             <div className="space-y-4">
