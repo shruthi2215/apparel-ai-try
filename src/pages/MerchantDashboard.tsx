@@ -340,6 +340,11 @@ export default function MerchantDashboard() {
             </Card>
           </TabsContent>
 
+          {/* Team */}
+          <TabsContent value="team" className="mt-4">
+            <TeamTab merchantId={merchant.id} />
+          </TabsContent>
+
           {/* Webhooks */}
           <TabsContent value="webhooks" className="mt-4">
             <Card className="p-6 border-border/60 bg-card/70 backdrop-blur-xl text-center text-muted-foreground">
@@ -351,21 +356,12 @@ export default function MerchantDashboard() {
 
           {/* Billing */}
           <TabsContent value="billing" className="mt-4">
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                { name: "Starter", price: "Free", feats: ["500 try-ons/mo", "1 website", "Community support"] },
-                { name: "Growth", price: "$49/mo", feats: ["10,000 try-ons/mo", "5 websites", "Email support", "Webhooks"], hot: true },
-                { name: "Enterprise", price: "Custom", feats: ["Unlimited try-ons", "White-label", "SLA + dedicated AI", "Priority support"] },
-              ].map((p) => (
-                <Card key={p.name} className={`p-6 border-border/60 bg-card/70 backdrop-blur-xl ${p.hot ? "ring-2 ring-primary" : ""}`}>
-                  {p.hot && <Badge className="mb-2">Popular</Badge>}
-                  <h3 className="font-bold text-lg">{p.name}</h3>
-                  <div className="text-2xl font-bold my-2">{p.price}</div>
-                  <ul className="text-sm text-muted-foreground space-y-1 mb-4">{p.feats.map((f) => <li key={f} className="flex gap-2"><Check className="w-4 h-4 text-primary" />{f}</li>)}</ul>
-                  <Button variant={p.hot ? "default" : "outline"} className="w-full" onClick={() => toast.info("Billing checkout coming soon")}>Choose {p.name}</Button>
-                </Card>
-              ))}
-            </div>
+            <BillingTab merchantId={merchant.id} currentPlanId={merchant.plan_id} />
+          </TabsContent>
+
+          {/* Settings */}
+          <TabsContent value="settings" className="mt-4">
+            <SettingsTab merchant={merchant} onSaved={loadAll} />
           </TabsContent>
         </Tabs>
       </div>
