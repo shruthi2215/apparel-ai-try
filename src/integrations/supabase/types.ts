@@ -676,7 +676,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_merchant_invites: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "user" | "merchant" | "staff"
