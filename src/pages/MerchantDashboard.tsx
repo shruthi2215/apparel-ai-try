@@ -236,8 +236,10 @@ export default function MerchantDashboard() {
             <TabsTrigger value="analytics"><BarChart3 className="w-4 h-4 mr-1" />Analytics</TabsTrigger>
             <TabsTrigger value="keys"><KeyRound className="w-4 h-4 mr-1" />API Keys</TabsTrigger>
             <TabsTrigger value="install"><Code2 className="w-4 h-4 mr-1" />Install</TabsTrigger>
+            <TabsTrigger value="team"><Users className="w-4 h-4 mr-1" />Team</TabsTrigger>
             <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" />Webhooks</TabsTrigger>
             <TabsTrigger value="billing"><CreditCard className="w-4 h-4 mr-1" />Billing</TabsTrigger>
+            <TabsTrigger value="settings"><Settings className="w-4 h-4 mr-1" />Settings</TabsTrigger>
           </TabsList>
 
           {/* Analytics */}
@@ -290,8 +292,9 @@ export default function MerchantDashboard() {
             <Card className="p-5 border-border/60 bg-card/70 backdrop-blur-xl">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-sm flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" />API Keys</h3>
-                <Button size="sm" onClick={() => { setShowKeyDialog(true); setNewKey(null); }}><Plus className="w-4 h-4 mr-1" />Generate key</Button>
+                <Button size="sm" disabled={merchant.status !== "active"} onClick={() => { setShowKeyDialog(true); setNewKey(null); }}><Plus className="w-4 h-4 mr-1" />Generate key</Button>
               </div>
+              {merchant.status !== "active" && <p className="text-xs text-muted-foreground mb-3">API keys are available once your account is approved.</p>}
               <Table>
                 <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Key</TableHead><TableHead>Last used</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
@@ -301,7 +304,12 @@ export default function MerchantDashboard() {
                       <TableCell className="font-mono text-xs">{k.key_prefix}…</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}</TableCell>
                       <TableCell>{k.revoked ? <Badge variant="destructive">Revoked</Badge> : <Badge>Active</Badge>}</TableCell>
-                      <TableCell>{!k.revoked && <Button size="icon" variant="ghost" onClick={() => revokeKey(k.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}</TableCell>
+                      <TableCell>{!k.revoked && (
+                        <div className="flex justify-end gap-1">
+                          <Button size="icon" variant="ghost" title="Rotate key" onClick={() => rotateKey(k.id)}><RefreshCw className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="ghost" title="Revoke key" onClick={() => revokeKey(k.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                        </div>
+                      )}</TableCell>
                     </TableRow>
                   ))}
                   {keys.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-6">No keys yet.</TableCell></TableRow>}
