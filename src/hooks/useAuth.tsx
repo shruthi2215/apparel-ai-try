@@ -15,7 +15,7 @@ interface Profile {
   preferred_fit: string | null;
 }
 
-export type AppRole = "super_admin" | "admin" | "user";
+export type AppRole = "super_admin" | "admin" | "merchant" | "staff" | "user";
 
 interface AuthContextType {
   user: User | null;
