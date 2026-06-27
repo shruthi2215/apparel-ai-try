@@ -195,12 +195,32 @@ export default function MerchantDashboard() {
           <Badge variant={merchant.status === "active" ? "default" : "destructive"} className="capitalize">{merchant.status}</Badge>
         </div>
 
+        {merchant.status !== "active" && (
+          <Card className={`p-4 mb-6 border flex items-start gap-3 ${merchant.status === "suspended" || merchant.status === "rejected" ? "border-destructive/40 bg-destructive/5" : "border-amber-500/40 bg-amber-500/5"}`}>
+            {merchant.status === "pending" && <Hourglass className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />}
+            {merchant.status === "suspended" && <Ban className="w-5 h-5 text-destructive shrink-0 mt-0.5" />}
+            {merchant.status === "rejected" && <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />}
+            <div>
+              <p className="font-medium text-sm">
+                {merchant.status === "pending" && "Awaiting Super Admin approval"}
+                {merchant.status === "suspended" && "Account suspended"}
+                {merchant.status === "rejected" && "Application not approved"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {merchant.status === "pending" && "Your merchant account is under review. API keys can be issued once an admin approves your business."}
+                {merchant.status === "suspended" && "Your API access is paused. Contact support to reactivate your account."}
+                {merchant.status === "rejected" && "Please update your business details and contact support to re-apply."}
+              </p>
+            </div>
+          </Card>
+        )}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Total try-ons", value: stats.total, icon: Activity },
             { label: "Successful", value: stats.ok, icon: CheckCircle2 },
             { label: "Failed", value: stats.failed, icon: XCircle },
-            { label: "Avg time", value: `${(stats.avg / 1000).toFixed(1)}s`, icon: Clock },
+            { label: "Quota used", value: `${stats.total}/${merchant.monthly_quota ?? "∞"}`, icon: Clock },
           ].map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
               <Card className="p-4 border-border/60 bg-card/70 backdrop-blur-xl">
