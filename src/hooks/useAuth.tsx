@@ -15,7 +15,7 @@ interface Profile {
   preferred_fit: string | null;
 }
 
-export type AppRole = "super_admin" | "admin" | "user";
+export type AppRole = "super_admin" | "admin" | "merchant" | "staff" | "user";
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +24,8 @@ interface AuthContextType {
   roles: AppRole[];
   isSuperAdmin: boolean;
   isAdmin: boolean;
+  isMerchant: boolean;
+  isStaff: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -36,6 +38,8 @@ const AuthContext = createContext<AuthContextType>({
   roles: [],
   isSuperAdmin: false,
   isAdmin: false,
+  isMerchant: false,
+  isStaff: false,
   loading: true,
   signOut: async () => {},
   refreshProfile: async () => {},
@@ -72,7 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 0);
+          setTimeout(() => {
+            if (_event === "SIGNED_IN") {
+              // Claim any pending team invitations for this email, then refresh roles.
+              supabase.functions.invoke("claim-invites").then(() => fetchProfile(session.user.id)).catch(() => {});
+            }
+            fetchProfile(session.user.id);
+          }, 0);
         } else {
           setProfile(null);
           setRoles([]);
@@ -97,10 +107,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isSuperAdmin = roles.includes("super_admin");
   const isAdmin = roles.includes("admin") || isSuperAdmin;
+  const isMerchant = roles.includes("merchant") || isAdmin;
+  const isStaff = roles.includes("staff");
 
   return (
     <AuthContext.Provider
-      value={{ user, session, profile, roles, isSuperAdmin, isAdmin, loading, signOut, refreshProfile }}
+      value={{ user, session, profile, roles, isSuperAdmin, isAdmin, isMerchant, isStaff, loading, signOut, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>

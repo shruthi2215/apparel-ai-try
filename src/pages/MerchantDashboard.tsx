@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
   Activity, Plus, Copy, Check, Trash2, KeyRound, Globe, BarChart3,
   CheckCircle2, XCircle, Clock, Webhook, CreditCard, Code2, Sparkles, ShieldCheck,
+  RefreshCw, Users, Settings, AlertTriangle, Hourglass, Ban,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -21,8 +22,11 @@ import {
 } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/sonner";
+import TeamTab from "@/components/merchant/TeamTab";
+import BillingTab from "@/components/merchant/BillingTab";
+import SettingsTab from "@/components/merchant/SettingsTab";
 
-interface Merchant { id: string; name: string; website_url: string | null; status: string; created_at: string; }
+interface Merchant { id: string; name: string; website_url: string | null; status: string; created_at: string; plan_id: string | null; monthly_quota: number | null; rate_limit_per_min: number | null; contact_email: string | null; }
 interface ApiKey { id: string; name: string | null; key_prefix: string; revoked: boolean; last_used_at: string | null; created_at: string; }
 interface TryReq { id: string; product_name: string | null; status: string; latency_ms: number | null; created_at: string; }
 
@@ -98,6 +102,18 @@ export default function MerchantDashboard() {
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Key revoked");
+    loadAll();
+  };
+
+  const rotateKey = async (id: string) => {
+    if (!merchant) return;
+    const { data, error } = await supabase.functions.invoke("merchant-keys", {
+      body: { action: "rotate", merchantId: merchant.id, keyId: id },
+    });
+    if (error || data?.error) { toast.error(error?.message || data?.error); return; }
+    setNewKey(data.key);
+    setShowKeyDialog(true);
+    toast.success("Key rotated — old key revoked");
     loadAll();
   };
 
@@ -179,12 +195,32 @@ export default function MerchantDashboard() {
           <Badge variant={merchant.status === "active" ? "default" : "destructive"} className="capitalize">{merchant.status}</Badge>
         </div>
 
+        {merchant.status !== "active" && (
+          <Card className={`p-4 mb-6 border flex items-start gap-3 ${merchant.status === "suspended" || merchant.status === "rejected" ? "border-destructive/40 bg-destructive/5" : "border-amber-500/40 bg-amber-500/5"}`}>
+            {merchant.status === "pending" && <Hourglass className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />}
+            {merchant.status === "suspended" && <Ban className="w-5 h-5 text-destructive shrink-0 mt-0.5" />}
+            {merchant.status === "rejected" && <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />}
+            <div>
+              <p className="font-medium text-sm">
+                {merchant.status === "pending" && "Awaiting Super Admin approval"}
+                {merchant.status === "suspended" && "Account suspended"}
+                {merchant.status === "rejected" && "Application not approved"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {merchant.status === "pending" && "Your merchant account is under review. API keys can be issued once an admin approves your business."}
+                {merchant.status === "suspended" && "Your API access is paused. Contact support to reactivate your account."}
+                {merchant.status === "rejected" && "Please update your business details and contact support to re-apply."}
+              </p>
+            </div>
+          </Card>
+        )}
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Total try-ons", value: stats.total, icon: Activity },
             { label: "Successful", value: stats.ok, icon: CheckCircle2 },
             { label: "Failed", value: stats.failed, icon: XCircle },
-            { label: "Avg time", value: `${(stats.avg / 1000).toFixed(1)}s`, icon: Clock },
+            { label: "Quota used", value: `${stats.total}/${merchant.monthly_quota ?? "∞"}`, icon: Clock },
           ].map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
               <Card className="p-4 border-border/60 bg-card/70 backdrop-blur-xl">
@@ -200,8 +236,10 @@ export default function MerchantDashboard() {
             <TabsTrigger value="analytics"><BarChart3 className="w-4 h-4 mr-1" />Analytics</TabsTrigger>
             <TabsTrigger value="keys"><KeyRound className="w-4 h-4 mr-1" />API Keys</TabsTrigger>
             <TabsTrigger value="install"><Code2 className="w-4 h-4 mr-1" />Install</TabsTrigger>
+            <TabsTrigger value="team"><Users className="w-4 h-4 mr-1" />Team</TabsTrigger>
             <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" />Webhooks</TabsTrigger>
             <TabsTrigger value="billing"><CreditCard className="w-4 h-4 mr-1" />Billing</TabsTrigger>
+            <TabsTrigger value="settings"><Settings className="w-4 h-4 mr-1" />Settings</TabsTrigger>
           </TabsList>
 
           {/* Analytics */}
@@ -254,8 +292,9 @@ export default function MerchantDashboard() {
             <Card className="p-5 border-border/60 bg-card/70 backdrop-blur-xl">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-sm flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" />API Keys</h3>
-                <Button size="sm" onClick={() => { setShowKeyDialog(true); setNewKey(null); }}><Plus className="w-4 h-4 mr-1" />Generate key</Button>
+                <Button size="sm" disabled={merchant.status !== "active"} onClick={() => { setShowKeyDialog(true); setNewKey(null); }}><Plus className="w-4 h-4 mr-1" />Generate key</Button>
               </div>
+              {merchant.status !== "active" && <p className="text-xs text-muted-foreground mb-3">API keys are available once your account is approved.</p>}
               <Table>
                 <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Key</TableHead><TableHead>Last used</TableHead><TableHead>Status</TableHead><TableHead></TableHead></TableRow></TableHeader>
                 <TableBody>
@@ -265,7 +304,12 @@ export default function MerchantDashboard() {
                       <TableCell className="font-mono text-xs">{k.key_prefix}…</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}</TableCell>
                       <TableCell>{k.revoked ? <Badge variant="destructive">Revoked</Badge> : <Badge>Active</Badge>}</TableCell>
-                      <TableCell>{!k.revoked && <Button size="icon" variant="ghost" onClick={() => revokeKey(k.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}</TableCell>
+                      <TableCell>{!k.revoked && (
+                        <div className="flex justify-end gap-1">
+                          <Button size="icon" variant="ghost" title="Rotate key" onClick={() => rotateKey(k.id)}><RefreshCw className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="ghost" title="Revoke key" onClick={() => revokeKey(k.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                        </div>
+                      )}</TableCell>
                     </TableRow>
                   ))}
                   {keys.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-6">No keys yet.</TableCell></TableRow>}
@@ -296,6 +340,11 @@ export default function MerchantDashboard() {
             </Card>
           </TabsContent>
 
+          {/* Team */}
+          <TabsContent value="team" className="mt-4">
+            <TeamTab merchantId={merchant.id} />
+          </TabsContent>
+
           {/* Webhooks */}
           <TabsContent value="webhooks" className="mt-4">
             <Card className="p-6 border-border/60 bg-card/70 backdrop-blur-xl text-center text-muted-foreground">
@@ -307,21 +356,12 @@ export default function MerchantDashboard() {
 
           {/* Billing */}
           <TabsContent value="billing" className="mt-4">
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                { name: "Starter", price: "Free", feats: ["500 try-ons/mo", "1 website", "Community support"] },
-                { name: "Growth", price: "$49/mo", feats: ["10,000 try-ons/mo", "5 websites", "Email support", "Webhooks"], hot: true },
-                { name: "Enterprise", price: "Custom", feats: ["Unlimited try-ons", "White-label", "SLA + dedicated AI", "Priority support"] },
-              ].map((p) => (
-                <Card key={p.name} className={`p-6 border-border/60 bg-card/70 backdrop-blur-xl ${p.hot ? "ring-2 ring-primary" : ""}`}>
-                  {p.hot && <Badge className="mb-2">Popular</Badge>}
-                  <h3 className="font-bold text-lg">{p.name}</h3>
-                  <div className="text-2xl font-bold my-2">{p.price}</div>
-                  <ul className="text-sm text-muted-foreground space-y-1 mb-4">{p.feats.map((f) => <li key={f} className="flex gap-2"><Check className="w-4 h-4 text-primary" />{f}</li>)}</ul>
-                  <Button variant={p.hot ? "default" : "outline"} className="w-full" onClick={() => toast.info("Billing checkout coming soon")}>Choose {p.name}</Button>
-                </Card>
-              ))}
-            </div>
+            <BillingTab merchantId={merchant.id} currentPlanId={merchant.plan_id} />
+          </TabsContent>
+
+          {/* Settings */}
+          <TabsContent value="settings" className="mt-4">
+            <SettingsTab merchant={merchant} onSaved={loadAll} />
           </TabsContent>
         </Tabs>
       </div>
