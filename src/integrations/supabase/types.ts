@@ -55,30 +55,260 @@ export type Database = {
           },
         ]
       }
-      merchants: {
+      audit_logs: {
         Row: {
+          action: string
+          actor_email: string | null
+          actor_user_id: string | null
           created_at: string
           id: string
+          ip: string | null
+          merchant_id: string | null
+          metadata: Json
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          merchant_id?: string | null
+          metadata?: Json
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip?: string | null
+          merchant_id?: string | null
+          metadata?: Json
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          issued_at: string
+          merchant_id: string
+          paid_at: string | null
+          period_end: string | null
+          period_start: string | null
+          provider_invoice_id: string | null
+          status: string
+          subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          issued_at?: string
+          merchant_id: string
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider_invoice_id?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          issued_at?: string
+          merchant_id?: string
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider_invoice_id?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchant_members: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          invited_at: string
+          invited_by: string | null
+          joined_at: string | null
+          merchant_id: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          merchant_id: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          merchant_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_members_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchant_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string
+          id: string
+          merchant_id: string
+          plan_id: string | null
+          provider: string | null
+          provider_subscription_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string
+          id?: string
+          merchant_id: string
+          plan_id?: string | null
+          provider?: string | null
+          provider_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string
+          id?: string
+          merchant_id?: string
+          plan_id?: string | null
+          provider?: string | null
+          provider_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_subscriptions_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "merchant_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchants: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          contact_email: string | null
+          created_at: string
+          id: string
+          monthly_quota: number
           name: string
           owner_user_id: string
+          plan_id: string | null
+          rate_limit_per_min: number
           status: string
           updated_at: string
           website_url: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          contact_email?: string | null
           created_at?: string
           id?: string
+          monthly_quota?: number
           name: string
           owner_user_id: string
+          plan_id?: string | null
+          rate_limit_per_min?: number
           status?: string
           updated_at?: string
           website_url?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          contact_email?: string | null
           created_at?: string
           id?: string
+          monthly_quota?: number
           name?: string
           owner_user_id?: string
+          plan_id?: string | null
+          rate_limit_per_min?: number
           status?: string
           updated_at?: string
           website_url?: string | null
@@ -249,6 +479,54 @@ export type Database = {
           skin_tone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          currency: string
+          features: Json
+          id: string
+          interval: string
+          is_active: boolean
+          monthly_quota: number
+          name: string
+          price_cents: number
+          rate_limit_per_min: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          features?: Json
+          id?: string
+          interval?: string
+          is_active?: boolean
+          monthly_quota?: number
+          name: string
+          price_cents?: number
+          rate_limit_per_min?: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          features?: Json
+          id?: string
+          interval?: string
+          is_active?: boolean
+          monthly_quota?: number
+          name?: string
+          price_cents?: number
+          rate_limit_per_min?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
