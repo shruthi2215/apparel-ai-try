@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
   Activity, Plus, Copy, Check, Trash2, KeyRound, Globe, BarChart3,
   CheckCircle2, XCircle, Clock, Webhook, CreditCard, Code2, Sparkles, ShieldCheck,
+  RefreshCw, Users, Settings, AlertTriangle, Hourglass, Ban,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -21,8 +22,11 @@ import {
 } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/components/ui/sonner";
+import TeamTab from "@/components/merchant/TeamTab";
+import BillingTab from "@/components/merchant/BillingTab";
+import SettingsTab from "@/components/merchant/SettingsTab";
 
-interface Merchant { id: string; name: string; website_url: string | null; status: string; created_at: string; }
+interface Merchant { id: string; name: string; website_url: string | null; status: string; created_at: string; plan_id: string | null; monthly_quota: number | null; rate_limit_per_min: number | null; contact_email: string | null; }
 interface ApiKey { id: string; name: string | null; key_prefix: string; revoked: boolean; last_used_at: string | null; created_at: string; }
 interface TryReq { id: string; product_name: string | null; status: string; latency_ms: number | null; created_at: string; }
 
@@ -98,6 +102,18 @@ export default function MerchantDashboard() {
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Key revoked");
+    loadAll();
+  };
+
+  const rotateKey = async (id: string) => {
+    if (!merchant) return;
+    const { data, error } = await supabase.functions.invoke("merchant-keys", {
+      body: { action: "rotate", merchantId: merchant.id, keyId: id },
+    });
+    if (error || data?.error) { toast.error(error?.message || data?.error); return; }
+    setNewKey(data.key);
+    setShowKeyDialog(true);
+    toast.success("Key rotated — old key revoked");
     loadAll();
   };
 
