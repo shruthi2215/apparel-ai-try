@@ -8,7 +8,7 @@ import { Check, Loader2, Sparkles } from "lucide-react";
 
 interface Plan {
   id: string; name: string; slug: string; price_cents: number; interval: string;
-  monthly_quota: number; rate_limit_per_min: number; features: string[];
+  monthly_quota: number; rate_limit_per_min: number; features: string[]; currency?: string;
 }
 interface Invoice { id: string; amount_cents: number; status: string; created_at: string; }
 
@@ -25,6 +25,13 @@ export default function BillingTab({ merchantId, currentPlanId }: { merchantId: 
       .then(({ data }) => setInvoices((data ?? []) as Invoice[]));
   }, [merchantId]);
 
+  const fmtPrice = (p: Plan) => {
+    const symbol = (p.currency || "inr").toLowerCase() === "inr" ? "₹" : "$";
+    return `${symbol}${(p.price_cents / 100).toLocaleString()}`;
+  };
+  const fmtAmount = (cents: number, currency = "inr") =>
+    `${currency.toLowerCase() === "inr" ? "₹" : "$"}${(cents / 100).toLocaleString()}`;
+
   const buy = async (plan: Plan) => {
     setBuying(plan.slug);
     const { data, error } = await supabase.functions.invoke("merchant-checkout", {
@@ -40,16 +47,23 @@ export default function BillingTab({ merchantId, currentPlanId }: { merchantId: 
 
   return (
     <div className="space-y-6">
+      <Card className="p-4 border-primary/40 bg-primary/5 backdrop-blur-xl">
+        <p className="text-sm font-medium flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          Start with a <span className="font-semibold">1-month free trial</span>, then upgrade as your daily customers grow.
+        </p>
+      </Card>
       <div className="grid md:grid-cols-3 gap-4">
         {plans.map((p) => {
           const current = p.id === currentPlanId;
           return (
             <Card key={p.id} className={`p-6 border bg-card/70 backdrop-blur-xl relative ${current ? "border-primary shadow-lg shadow-primary/10" : "border-border/60"}`}>
               {current && <Badge className="absolute top-4 right-4">Current</Badge>}
+              {!current && p.slug === "starter" && <Badge variant="secondary" className="absolute top-4 right-4">Free trial</Badge>}
               <h3 className="font-bold text-xl flex items-center gap-2">{p.name}{p.slug === "growth" && <Sparkles className="w-4 h-4 text-primary" />}</h3>
               <div className="flex items-baseline gap-1 mt-2">
-                <span className="text-3xl font-bold">${(p.price_cents / 100).toFixed(0)}</span>
-                <span className="text-sm text-muted-foreground">/{p.interval}</span>
+                <span className="text-3xl font-bold">{fmtPrice(p)}</span>
+                <span className="text-sm text-muted-foreground">{p.price_cents === 0 ? "" : `/${p.interval}`}</span>
               </div>
               <ul className="text-sm text-muted-foreground space-y-2 mt-4 mb-6">
                 <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" />{p.monthly_quota.toLocaleString()} try-ons / mo</li>
@@ -57,7 +71,7 @@ export default function BillingTab({ merchantId, currentPlanId }: { merchantId: 
                 {(p.features || []).map((f) => <li key={f} className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" />{f}</li>)}
               </ul>
               <Button className="w-full" variant={current ? "outline" : "default"} disabled={current || buying === p.slug} onClick={() => buy(p)}>
-                {buying === p.slug ? <Loader2 className="w-4 h-4 animate-spin" /> : current ? "Active plan" : p.price_cents === 0 ? "Switch to Free" : "Buy Now"}
+                {buying === p.slug ? <Loader2 className="w-4 h-4 animate-spin" /> : current ? "Active plan" : p.price_cents === 0 ? "Start free trial" : "Buy Now"}
               </Button>
             </Card>
           );
@@ -73,7 +87,7 @@ export default function BillingTab({ merchantId, currentPlanId }: { merchantId: 
             {invoices.map((i) => (
               <div key={i.id} className="flex items-center justify-between text-sm py-2 border-b border-border/40 last:border-0">
                 <span className="text-muted-foreground">{new Date(i.created_at).toLocaleDateString()}</span>
-                <span className="font-medium">${(i.amount_cents / 100).toFixed(2)}</span>
+                <span className="font-medium">{fmtAmount(i.amount_cents)}</span>
                 <Badge variant={i.status === "paid" ? "default" : "secondary"} className="capitalize">{i.status}</Badge>
               </div>
             ))}

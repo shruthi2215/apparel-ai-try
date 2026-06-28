@@ -22,8 +22,8 @@ export default function Navbar() {
   const navLinks = isSuperAdmin
     ? [...baseLinks, { label: "For Developers", href: "/api-docs" }]
     : baseLinks;
-  // Only users with merchant access (merchant/staff/admin) see the merchant area.
-  const canSeeMerchant = isMerchant || isStaff;
+  // Any logged-in user can open the Merchant area to register / view billing.
+  const canSeeMerchant = !!user;
 
   const handleNav = (href: string) => { navigate(href); setOpen(false); };
   const handleSignOut = async () => { await signOut(); navigate("/"); setOpen(false); };

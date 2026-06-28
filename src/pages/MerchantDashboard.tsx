@@ -252,7 +252,7 @@ export default function MerchantDashboard() {
           ))}
         </div>
 
-        <Tabs defaultValue="analytics">
+        <Tabs defaultValue="billing">
           <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="analytics"><BarChart3 className="w-4 h-4 mr-1" />Analytics</TabsTrigger>
             <TabsTrigger value="keys"><KeyRound className="w-4 h-4 mr-1" />API Keys</TabsTrigger>
