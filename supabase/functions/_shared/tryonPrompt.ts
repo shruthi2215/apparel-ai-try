@@ -82,7 +82,7 @@ export async function runTryOn(opts: {
     method: "POST",
     headers: { Authorization: `Bearer ${opts.apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-3.1-flash-image-preview",
+      model: "google/gemini-3.1-flash-image",
       messages: [{ role: "user", content: userContent }],
       modalities: ["image", "text"],
     }),
