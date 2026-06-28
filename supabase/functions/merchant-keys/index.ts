@@ -45,7 +45,7 @@ serve(async (req) => {
   // Verify the user owns this merchant (or is super admin).
   const { data: merchant } = await admin
     .from("merchants")
-    .select("id, owner_user_id, status")
+    .select("id, owner_user_id, status, plan_id")
     .eq("id", merchantId)
     .maybeSingle();
   if (!merchant) return json({ error: "Merchant not found" }, 404);
@@ -54,6 +54,17 @@ serve(async (req) => {
   const isSuperAdmin = (roleRows ?? []).some((r: any) => r.role === "super_admin");
   if (merchant.owner_user_id !== user.id && !isSuperAdmin) {
     return json({ error: "Forbidden" }, 403);
+  }
+
+  // API keys expire based on the merchant's purchased plan duration (period_days).
+  async function computeExpiry(): Promise<string> {
+    let periodDays = 30;
+    if (merchant.plan_id) {
+      const { data: plan } = await admin
+        .from("subscription_plans").select("period_days").eq("id", merchant.plan_id).maybeSingle();
+      if (plan?.period_days) periodDays = plan.period_days;
+    }
+    return new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000).toISOString();
   }
 
   async function audit(action: string, targetId: string | null, metadata: Record<string, unknown> = {}) {
@@ -72,10 +83,11 @@ serve(async (req) => {
     const rawKey = generateKey();
     const keyHash = await sha256Hex(rawKey);
     const keyPrefix = rawKey.slice(0, 12);
+    const expiresAt = await computeExpiry();
     const { data, error } = await admin
       .from("api_keys")
-      .insert({ merchant_id: merchantId, name: label, key_prefix: keyPrefix, key_hash: keyHash })
-      .select("id, name, key_prefix, created_at")
+      .insert({ merchant_id: merchantId, name: label, key_prefix: keyPrefix, key_hash: keyHash, expires_at: expiresAt })
+      .select("id, name, key_prefix, created_at, expires_at")
       .single();
     if (error) throw new Error(error.message);
     return { ...data, key: rawKey };
@@ -91,13 +103,14 @@ serve(async (req) => {
     const rawKey = generateKey();
     const keyHash = await sha256Hex(rawKey);
     const keyPrefix = rawKey.slice(0, 12);
+    const expiresAt = await computeExpiry();
     const { data, error } = await admin
       .from("api_keys")
-      .insert({ merchant_id: merchantId, name: name || "Default key", key_prefix: keyPrefix, key_hash: keyHash })
-      .select("id, name, key_prefix, created_at")
+      .insert({ merchant_id: merchantId, name: name || "Default key", key_prefix: keyPrefix, key_hash: keyHash, expires_at: expiresAt })
+      .select("id, name, key_prefix, created_at, expires_at")
       .single();
     if (error) return json({ error: error.message }, 400);
-    await audit("api_key.created", data.id, { name: data.name });
+    await audit("api_key.created", data.id, { name: data.name, expires_at: data.expires_at });
     // Return the raw key ONCE — it is never stored or retrievable again.
     return json({ ...data, key: rawKey }, 200);
   }
