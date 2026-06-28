@@ -93,6 +93,24 @@ export default function Navbar() {
                     Merchant
                   </Button>
                 )}
+                {isAdmin && !isSuperAdmin && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/admin")}
+                    className="font-body text-muted-foreground hover:text-foreground text-sm h-9"
+                  >
+                    Admin
+                  </Button>
+                )}
+                {isSuperAdmin && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => navigate("/super-admin")}
+                    className="font-body text-muted-foreground hover:text-foreground text-sm h-9"
+                  >
+                    Super Admin
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/profile")}
