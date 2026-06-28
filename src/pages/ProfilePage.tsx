@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
   User, Heart, Clock, Package, Settings, LogOut,
-  Camera, Edit3, Check, X
+  Camera, Edit3, Check, X, Lock, Eye, EyeOff
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,6 +17,7 @@ const TABS = [
   { id: "history", label: "Try-On History", icon: Clock },
   { id: "wishlist", label: "Wishlist", icon: Heart },
   { id: "orders", label: "Orders", icon: Package },
+  { id: "security", label: "Security", icon: Lock },
 ];
 
 export default function ProfilePage() {
@@ -32,6 +33,10 @@ export default function ProfilePage() {
   const [weight, setWeight] = useState("");
   const [sessions, setSessions] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
@@ -75,6 +80,24 @@ export default function ProfilePage() {
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const changePassword = async () => {
+    if (newPassword.length < 6) {
+      toast({ title: "Password too short", description: "Use at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Passwords don't match", description: "Please re-enter the same password.", variant: "destructive" });
+      return;
+    }
+    setChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setChangingPassword(false);
+    if (error) { toast({ title: "Couldn't update password", description: error.message, variant: "destructive" }); return; }
+    setNewPassword("");
+    setConfirmPassword("");
+    toast({ title: "Password updated! ✓", description: "Your new password is now active." });
   };
 
   if (!user) return null;
@@ -266,6 +289,58 @@ export default function ProfilePage() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Security Tab */}
+          {activeTab === "security" && (
+            <div className="glass-card rounded-3xl p-6 md:p-8 max-w-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <Lock className="w-5 h-5 text-foreground" />
+                <h2 className="font-display text-xl font-bold text-foreground">Change Password</h2>
+              </div>
+              <p className="font-body text-sm text-muted-foreground mb-6">
+                Update the password for <span className="text-foreground font-medium">{user.email}</span>. This applies to your account whatever your role.
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="font-body text-sm text-muted-foreground mb-1.5 block">New password</label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="At least 6 characters"
+                      className="bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground rounded-xl h-11 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="font-body text-sm text-muted-foreground mb-1.5 block">Confirm new password</label>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter password"
+                    className="bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground rounded-xl h-11"
+                  />
+                </div>
+                <Button
+                  onClick={changePassword}
+                  disabled={changingPassword}
+                  className="bg-gradient-hero text-white border-0 rounded-xl font-body font-semibold"
+                >
+                  <Lock className="w-4 h-4 mr-2" /> {changingPassword ? "Updating…" : "Update Password"}
+                </Button>
+              </div>
             </div>
           )}
         </div>
