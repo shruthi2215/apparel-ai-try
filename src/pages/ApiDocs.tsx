@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Check, Terminal, KeyRound, Webhook, AlertTriangle, Gauge, Package, Rocket } from "lucide-react";
+import { Copy, Check, Terminal, KeyRound, Webhook, AlertTriangle, Gauge, Package, Rocket, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 const BASE = typeof window !== "undefined" ? window.location.origin : "";
 const API = "https://vonppkdllfzztpibtewy.supabase.co/functions/v1/tryon-api";
@@ -32,6 +33,7 @@ function Section({ id, icon: Icon, title, children }: any) {
 
 export default function ApiDocs() {
   const navigate = useNavigate();
+  const { isSuperAdmin } = useAuth();
   const nav = [
     ["auth", "Authentication"], ["endpoint", "Try-On Endpoint"], ["sdk", "JavaScript SDK"],
     ["responses", "Responses"], ["errors", "Error Codes"], ["rate", "Rate Limits"],
@@ -48,8 +50,30 @@ export default function ApiDocs() {
             <h1 className="text-3xl font-bold">TryOnMe API & SDK</h1>
             <p className="text-muted-foreground">Add AI virtual try-on to any fashion store. REST API + drop-in widget.</p>
           </div>
-          <Button onClick={() => navigate("/merchant")}><KeyRound className="w-4 h-4 mr-1" />Get API key</Button>
+          {isSuperAdmin ? (
+            <Button onClick={() => navigate("/super-admin")}>
+              <ShieldCheck className="w-4 h-4 mr-1" />Manage merchants & keys
+            </Button>
+          ) : (
+            <Button onClick={() => navigate("/merchant")}>
+              <KeyRound className="w-4 h-4 mr-1" />Get API key
+            </Button>
+          )}
         </div>
+
+        {isSuperAdmin && (
+          <Card className="mb-8 p-4 border-primary/30 bg-primary/5 flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold">You're viewing this as a developer (Super Admin).</p>
+              <p className="text-muted-foreground">
+                You don't generate keys for yourself here. Go to the{" "}
+                <button onClick={() => navigate("/super-admin")} className="text-primary underline underline-offset-2">Super Admin → Merchants</button>{" "}
+                tab to approve merchants, issue/revoke their API keys, adjust plans & rate limits, and suspend or reactivate access based on their subscription.
+              </p>
+            </div>
+          </Card>
+        )}
 
         <div className="grid lg:grid-cols-[200px_1fr] gap-8">
           <nav className="hidden lg:block sticky top-24 self-start space-y-1 text-sm">
