@@ -17,6 +17,8 @@ export type Database = {
       api_keys: {
         Row: {
           created_at: string
+          expires_at: string | null
+          expiry_alert_sent_at: string | null
           id: string
           key_hash: string
           key_prefix: string
@@ -27,6 +29,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          expires_at?: string | null
+          expiry_alert_sent_at?: string | null
           id?: string
           key_hash: string
           key_prefix: string
@@ -37,6 +41,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          expires_at?: string | null
+          expiry_alert_sent_at?: string | null
           id?: string
           key_hash?: string
           key_prefix?: string
@@ -272,8 +278,11 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           contact_email: string | null
+          contact_name: string | null
           created_at: string
+          gstin: string | null
           id: string
+          mobile: string | null
           monthly_quota: number
           name: string
           owner_user_id: string
@@ -287,8 +296,11 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           contact_email?: string | null
+          contact_name?: string | null
           created_at?: string
+          gstin?: string | null
           id?: string
+          mobile?: string | null
           monthly_quota?: number
           name: string
           owner_user_id: string
@@ -302,8 +314,11 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           contact_email?: string | null
+          contact_name?: string | null
           created_at?: string
+          gstin?: string | null
           id?: string
+          mobile?: string | null
           monthly_quota?: number
           name?: string
           owner_user_id?: string
@@ -492,6 +507,7 @@ export type Database = {
           is_active: boolean
           monthly_quota: number
           name: string
+          period_days: number
           price_cents: number
           rate_limit_per_min: number
           slug: string
@@ -507,6 +523,7 @@ export type Database = {
           is_active?: boolean
           monthly_quota?: number
           name: string
+          period_days?: number
           price_cents?: number
           rate_limit_per_min?: number
           slug: string
@@ -522,6 +539,7 @@ export type Database = {
           is_active?: boolean
           monthly_quota?: number
           name?: string
+          period_days?: number
           price_cents?: number
           rate_limit_per_min?: number
           slug?: string
