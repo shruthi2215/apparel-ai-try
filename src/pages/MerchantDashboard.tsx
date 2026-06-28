@@ -42,6 +42,10 @@ export default function MerchantDashboard() {
   // create-merchant form
   const [bizName, setBizName] = useState("");
   const [bizSite, setBizSite] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [gstin, setGstin] = useState("");
 
   // new key dialog
   const [keyName, setKeyName] = useState("");
@@ -75,12 +79,23 @@ export default function MerchantDashboard() {
 
   const createMerchant = async () => {
     if (!user || !bizName.trim()) { toast.error("Enter a business name"); return; }
+    if (!contactName.trim()) { toast.error("Enter a contact name"); return; }
+    if (!mobile.trim()) { toast.error("Enter a mobile number"); return; }
+    if (gstin.trim() && !/^[0-9A-Z]{15}$/.test(gstin.trim().toUpperCase())) {
+      toast.error("GSTIN must be 15 characters"); return;
+    }
     const { error } = await supabase.from("merchants").insert({
-      owner_user_id: user.id, name: bizName.trim(), website_url: bizSite.trim() || null,
+      owner_user_id: user.id,
+      name: bizName.trim(),
+      website_url: bizSite.trim() || null,
+      contact_name: contactName.trim(),
+      mobile: mobile.trim(),
+      contact_email: contactEmail.trim() || user.email || null,
+      gstin: gstin.trim() ? gstin.trim().toUpperCase() : null,
     });
     if (error) { toast.error(error.message); return; }
-    toast.success("Merchant account created");
-    setBizName(""); setBizSite("");
+    toast.success("Merchant account created — awaiting approval");
+    setBizName(""); setBizSite(""); setContactName(""); setMobile(""); setContactEmail(""); setGstin("");
     loadAll();
   };
 
@@ -173,6 +188,12 @@ export default function MerchantDashboard() {
               <p className="text-muted-foreground text-sm mb-6">Set up your business to generate API keys and start integrating TryOnMe on your store.</p>
               <div className="space-y-4">
                 <div><label className="text-sm font-medium">Business name *</label><Input value={bizName} onChange={(e) => setBizName(e.target.value)} placeholder="Acme Fashion" className="mt-1" /></div>
+                <div><label className="text-sm font-medium">Contact name *</label><Input value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Full name" className="mt-1" /></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div><label className="text-sm font-medium">Mobile number *</label><Input value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="+91 98765 43210" className="mt-1" /></div>
+                  <div><label className="text-sm font-medium">Email</label><Input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} type="email" placeholder="billing@acme.com" className="mt-1" /></div>
+                </div>
+                <div><label className="text-sm font-medium">GSTIN</label><Input value={gstin} onChange={(e) => setGstin(e.target.value)} placeholder="22AAAAA0000A1Z5" maxLength={15} className="mt-1 uppercase" /></div>
                 <div><label className="text-sm font-medium">Website URL</label><Input value={bizSite} onChange={(e) => setBizSite(e.target.value)} placeholder="https://acme.com" className="mt-1" /></div>
                 <Button onClick={createMerchant} className="w-full">Create account</Button>
               </div>

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.tryon-api]
 verify_jwt = false
+
+[functions.expire-api-keys]
+verify_jwt = false
