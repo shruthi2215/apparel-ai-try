@@ -51,12 +51,16 @@ serve(async (req) => {
   const keyHash = await sha256Hex(rawKey);
   const { data: keyRow } = await admin
     .from("api_keys")
-    .select("id, merchant_id, revoked")
+    .select("id, merchant_id, revoked, expires_at")
     .eq("key_hash", keyHash)
     .maybeSingle();
 
   if (!keyRow || keyRow.revoked) {
     return json({ error: "Invalid or revoked API key.", requestId, status: "failed" }, 401);
+  }
+
+  if (keyRow.expires_at && new Date(keyRow.expires_at).getTime() < Date.now()) {
+    return json({ error: "API key has expired. Renew your plan to continue.", requestId, status: "failed" }, 401);
   }
 
   const { data: merchant } = await admin
