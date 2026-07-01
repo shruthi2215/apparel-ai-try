@@ -223,6 +223,11 @@
     }
 
     function submit() {
+      // Guard against the placeholder key being left in the snippet.
+      if (!config.apiKey || /YOUR_API_KEY|tk_live_xxx|…/.test(config.apiKey)) {
+        render("upload", { error: "Invalid API key. Replace the placeholder in TryOnMe.init() with your real key from the merchant dashboard." });
+        return;
+      }
       render("loading");
       fetch(API_BASE, {
         method: "POST",
@@ -237,12 +242,25 @@
           dontSave: !config.autoSave,
         }),
       })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-        .then(function (res) {
-          if (res.ok && res.j.imageUrl) { render("result", res.j.imageUrl); }
-          else { render("upload", { error: res.j.error || "Try-on failed. Please try again." }); }
+        .then(function (r) {
+          return r.text().then(function (t) {
+            var j = {};
+            try { j = t ? JSON.parse(t) : {}; } catch (e) { j = {}; }
+            return { ok: r.ok, status: r.status, j: j };
+          });
         })
-        .catch(function () { render("upload", { error: "Network error. Please try again." }); });
+        .then(function (res) {
+          if (res.ok && res.j.imageUrl) { render("result", res.j.imageUrl); return; }
+          var msg = res.j.error;
+          if (!msg) {
+            if (res.status === 401) msg = "Authentication failed — check that your API key is valid and active.";
+            else if (res.status === 403) msg = "Your merchant account isn't active or approved yet.";
+            else if (res.status === 429) msg = "Rate limit or monthly quota reached. Please try again later.";
+            else msg = "Try-on failed (HTTP " + res.status + "). Please try again.";
+          }
+          render("upload", { error: msg });
+        })
+        .catch(function () { render("upload", { error: "Couldn't reach the try-on service. Check your internet connection and try again." }); });
     }
 
     render("upload");
