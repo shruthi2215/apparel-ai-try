@@ -344,10 +344,14 @@ export default function MerchantDashboard() {
             <Card className="p-5 border-border/60 bg-card/70 backdrop-blur-xl space-y-4">
               <h3 className="font-semibold text-sm">Quick install — JavaScript widget</h3>
               <p className="text-sm text-muted-foreground">Paste this before <code>&lt;/body&gt;</code> on your store, then tag product images with <code>data-tryon</code>.</p>
+              <p className="text-xs text-amber-500 flex items-start gap-1.5">
+                <span>⚠️</span>
+                <span>Replace <code>YOUR_API_KEY</code> with the full key shown when you generate one under <b>API Keys</b>. The prefix listed there (<code>{keys.find((k) => !k.revoked)?.key_prefix || "tk_live_…"}…</code>) is only a preview — the full key is shown once at creation and cannot be recovered. Using the prefix or a placeholder will fail with an authentication error.</span>
+              </p>
               <pre className="bg-muted/60 rounded-lg p-4 text-xs overflow-x-auto"><code>{`<script src="${window.location.origin}/sdk/tryonme.js"></script>
 <script>
   TryOnMe.init({
-    apiKey: "${keys.find((k) => !k.revoked)?.key_prefix || "tk_live_xxx"}…",
+    apiKey: "YOUR_API_KEY",
     merchantId: "${merchant.id}"
   });
 </script>
@@ -357,6 +361,9 @@ export default function MerchantDashboard() {
      data-product-id="SKU-123"
      data-product-name="Anarkali Kurti"
      data-product-category="kurti" />`}</code></pre>
+              {!keys.some((k) => !k.revoked) && (
+                <p className="text-xs text-muted-foreground">You don't have an active API key yet. Go to the <b>API Keys</b> tab and click <b>Generate key</b> first.</p>
+              )}
               <Button variant="outline" onClick={() => navigate("/api-docs")}><Code2 className="w-4 h-4 mr-1" />Full API & SDK docs</Button>
             </Card>
           </TabsContent>

@@ -105,7 +105,7 @@ export default function ApiDocs() {
 }`} />
               <h4 className="font-semibold text-sm mt-3">cURL example</h4>
               <CodeBlock code={`curl -X POST '${API}' \\
-  -H 'x-api-key: tk_live_xxx' \\
+  -H 'x-api-key: YOUR_API_KEY' \\
   -H 'Content-Type: application/json' \\
   -d '{
     "userImage": "data:image/jpeg;base64,...",
@@ -120,7 +120,7 @@ export default function ApiDocs() {
               <CodeBlock code={`<script src="${BASE}/sdk/tryonme.js"></script>
 <script>
   TryOnMe.init({
-    apiKey: "tk_live_xxx",
+    apiKey: "YOUR_API_KEY",
     merchantId: "merchant001",
     buttonText: "Try On"      // optional
   });
