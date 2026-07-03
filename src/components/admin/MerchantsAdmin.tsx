@@ -9,13 +9,16 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/sonner";
-import { CheckCircle2, Ban, RotateCcw, XCircle, Sliders, Search, Clock } from "lucide-react";
+import { CheckCircle2, Ban, RotateCcw, XCircle, Sliders, Search, Clock, Eye, ExternalLink, Globe, Mail, Phone, FileText, KeyRound, Activity } from "lucide-react";
 
 interface Merchant {
   id: string; name: string; website_url: string | null; status: string;
   owner_user_id: string; contact_email: string | null; created_at: string;
   rate_limit_per_min: number; monthly_quota: number; plan_id: string | null;
+  contact_name?: string | null; mobile?: string | null; gstin?: string | null;
 }
 interface Plan { id: string; name: string; slug: string; }
 
@@ -31,6 +34,7 @@ export default function MerchantsAdmin() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [busy, setBusy] = useState(false);
   const [edit, setEdit] = useState<Merchant | null>(null);
+  const [detail, setDetail] = useState<Merchant | null>(null);
   const [rl, setRl] = useState(0);
   const [mq, setMq] = useState(0);
   const [planSlug, setPlanSlug] = useState("");
