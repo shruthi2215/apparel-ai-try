@@ -185,6 +185,92 @@ export default function MerchantsAdmin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+          {detail && (() => {
+            const used = usage[detail.id] || 0;
+            const quota = detail.monthly_quota || 0;
+            const pct = quota ? Math.min(100, Math.round((used / quota) * 100)) : 0;
+            const site = detail.website_url
+              ? (detail.website_url.startsWith("http") ? detail.website_url : `https://${detail.website_url}`)
+              : null;
+            return (
+              <>
+                <SheetHeader>
+                  <div className="flex items-center gap-2">
+                    <SheetTitle>{detail.name}</SheetTitle>
+                    <Badge variant={statusVariant(detail.status)} className="capitalize">{detail.status}</Badge>
+                  </div>
+                  <SheetDescription>
+                    {plans.find((p) => p.id === detail.plan_id)?.name || "No plan"} · joined {new Date(detail.created_at).toLocaleDateString()}
+                  </SheetDescription>
+                </SheetHeader>
+
+                <div className="mt-6 space-y-5">
+                  {site && (
+                    <a href={site} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-2 rounded-xl border border-border/60 bg-card/60 p-3 hover:border-primary/60 transition-colors">
+                      <span className="flex items-center gap-2 text-sm min-w-0">
+                        <Globe className="w-4 h-4 text-primary shrink-0" />
+                        <span className="truncate">{detail.website_url}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-primary shrink-0">Visit site <ExternalLink className="w-3.5 h-3.5" /></span>
+                    </a>
+                  )}
+
+                  <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-2 text-muted-foreground"><Activity className="w-4 h-4" /> Try-on usage this cycle</span>
+                      <span className="font-medium">{used.toLocaleString()} / {quota.toLocaleString()}</span>
+                    </div>
+                    <Progress value={pct} className="h-2" />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                      <span className="flex items-center gap-1"><KeyRound className="w-3.5 h-3.5" /> {keyCounts[detail.id] || 0} active API keys</span>
+                      <span>{detail.rate_limit_per_min}/min limit</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-sm">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Merchant details</p>
+                    <DetailRow icon={<Sliders className="w-4 h-4" />} label="Contact" value={detail.contact_name} />
+                    <DetailRow icon={<Mail className="w-4 h-4" />} label="Email" value={detail.contact_email} />
+                    <DetailRow icon={<Phone className="w-4 h-4" />} label="Mobile" value={detail.mobile} />
+                    <DetailRow icon={<FileText className="w-4 h-4" />} label="GSTIN" value={detail.gstin} />
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button className="flex-1" variant="outline" onClick={() => { const m = detail; setDetail(null); openEdit(m); }}>
+                      <Sliders className="w-4 h-4 mr-1" /> Manage
+                    </Button>
+                    {detail.status === "active" && (
+                      <Button className="flex-1" variant="outline" disabled={busy}
+                        onClick={() => act(detail.id, "suspend").then((ok) => ok && setDetail(null))}>
+                        <Ban className="w-4 h-4 mr-1" /> Suspend
+                      </Button>
+                    )}
+                    {detail.status === "pending" && (
+                      <Button className="flex-1" disabled={busy}
+                        onClick={() => act(detail.id, "approve").then((ok) => ok && setDetail(null))}>
+                        <CheckCircle2 className="w-4 h-4 mr-1" /> Approve
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value?: string | null }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-border/40 last:border-0">
+      <span className="flex items-center gap-2 text-muted-foreground">{icon}{label}</span>
+      <span className="font-medium text-right truncate max-w-[200px]">{value || "—"}</span>
     </div>
   );
 }
