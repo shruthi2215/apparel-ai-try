@@ -306,7 +306,7 @@
     }
 
     render("upload");
-    modal.appendChild(el("div", "tom-foot", "Powered by TryOnMe · Your photo is processed securely and not shared."));
+    modal.appendChild(el("div", "tom-foot", "🔒 Powered by TryOnMe · Your photo is never stored — processed securely and deleted right after your try-on."));
     document.body.appendChild(overlay);
   }
 
