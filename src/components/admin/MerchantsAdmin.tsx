@@ -125,8 +125,10 @@ export default function MerchantsAdmin() {
             {filtered.map((m) => (
               <TableRow key={m.id}>
                 <TableCell>
-                  <div className="font-medium">{m.name}</div>
-                  <div className="text-xs text-muted-foreground">{m.website_url || m.contact_email || "—"}</div>
+                  <button onClick={() => setDetail(m)} className="text-left group">
+                    <div className="font-medium group-hover:text-primary transition-colors">{m.name}</div>
+                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">{m.website_url || m.contact_email || "—"}</div>
+                  </button>
                 </TableCell>
                 <TableCell><Badge variant={statusVariant(m.status)} className="capitalize">{m.status}</Badge></TableCell>
                 <TableCell className="text-sm">{plans.find((p) => p.id === m.plan_id)?.name || "—"}</TableCell>
