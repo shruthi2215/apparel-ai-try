@@ -193,6 +193,7 @@
       var right = el("div", "tom-pane");
       right.appendChild(el("div", "tom-label", "Your photo"));
       if (data && data.error) right.appendChild(el("div", "tom-err", data.error));
+      if (data && data.warn) right.appendChild(el("div", "tom-warn", "⚠ " + data.warn));
 
       if (userImg) {
         var prev = el("div", "tom-preview");
@@ -204,10 +205,13 @@
         pr.appendChild(rm);
         right.appendChild(pr);
       } else {
-        var drop = el("div", "tom-drop", "📷 Click to upload a full-body photo<br><span style='font-size:11px'>or use your camera below</span>");
+        var drop = el("div", "tom-drop", "📷 Click to upload a clear, full-body photo<br><span style='font-size:11px'>JPG or PNG · well-lit · facing the camera</span>");
         var fileInput = el("input"); fileInput.type = "file"; fileInput.accept = "image/*"; fileInput.style.display = "none";
         fileInput.onchange = function () {
-          if (fileInput.files[0]) toDataUrl(fileInput.files[0], function (d) { userImg = d; render("upload"); });
+          if (fileInput.files[0]) readAndValidate(fileInput.files[0], function (d, warn) {
+            if (!d) { render("upload", { error: warn }); return; }
+            userImg = d; render("upload", warn ? { warn: warn } : undefined);
+          });
         };
         drop.onclick = function () { fileInput.click(); };
         right.appendChild(drop);
@@ -217,7 +221,14 @@
         camBtn.style.width = "100%";
         camBtn.onclick = function () { startCamera(right, function (d) { userImg = d; render("upload"); }); };
         right.appendChild(camBtn);
+
+        right.appendChild(el("div", "tom-tips",
+          "<b>Tips for the best try-on:</b><br>• Stand straight, full body in frame<br>• Bright, even lighting · plain background<br>• Avoid blurry, dark or cropped photos"));
       }
+
+      var privacy = el("div", "tom-privacy");
+      privacy.innerHTML = LOCK + "<span><b>Your privacy is protected.</b> We do <b>not</b> store your photo. It is processed securely for this try-on only and deleted immediately after.</span>";
+      right.appendChild(privacy);
 
       var go = el("button", "tom-primary", "✨ Generate Try-On");
       go.disabled = !userImg;
