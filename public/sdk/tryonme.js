@@ -60,6 +60,11 @@
     + '.tom-bar i{display:block;height:100%;width:30%;background:linear-gradient(90deg,#7c3aed,#db2777);border-radius:9999px;animation:tomLoad 1.6s ease-in-out infinite}'
     + '@keyframes tomLoad{0%{margin-left:-30%}100%{margin-left:100%}}'
     + '.tom-err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:13px}'
+    + '.tom-warn{background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12.5px}'
+    + '.tom-tips{background:#f8fafc;border:1px solid #eef2f7;border-radius:10px;padding:10px 12px;font-size:12px;color:#475569;line-height:1.5}'
+    + '.tom-tips b{color:#0f172a}'
+    + '.tom-privacy{display:flex;align-items:flex-start;gap:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px 11px;font-size:12px;color:#15803d;line-height:1.45}'
+    + '.tom-privacy svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;color:#16a34a}'
     + '.tom-foot{padding:0 22px 18px;font-size:11px;color:#94a3b8;text-align:center}';
 
   function injectCSS() {
@@ -71,6 +76,7 @@
   }
 
   var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15l-1.9-4.1L5.5 9l4.6-1.4z"/></svg>';
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
   function el(tag, cls, html) {
     var e = document.createElement(tag);
@@ -83,6 +89,31 @@
     var r = new FileReader();
     r.onload = function () { cb(r.result); };
     r.readAsDataURL(file);
+  }
+
+  // Validate the uploaded photo so the AI gets a clear, usable image.
+  // Returns via cb(dataUrl, warning) — warning is a string or null.
+  function readAndValidate(file, cb) {
+    if (!file || !/^image\//.test(file.type)) {
+      cb(null, "Please choose an image file (JPG or PNG).");
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      cb(null, "That image is larger than 12 MB. Please upload a smaller photo.");
+      return;
+    }
+    toDataUrl(file, function (d) {
+      var probe = new Image();
+      probe.onload = function () {
+        if (probe.naturalWidth < 300 || probe.naturalHeight < 400) {
+          cb(d, "This photo looks small or low-resolution — the result may be blurry. For best quality use a clear, well-lit, full-body photo (at least 600×800).");
+        } else {
+          cb(d, null);
+        }
+      };
+      probe.onerror = function () { cb(null, "We couldn't read that image. Please try a different photo."); };
+      probe.src = d;
+    });
   }
 
   /* --------------------------- the popup --------------------------- */
@@ -162,6 +193,7 @@
       var right = el("div", "tom-pane");
       right.appendChild(el("div", "tom-label", "Your photo"));
       if (data && data.error) right.appendChild(el("div", "tom-err", data.error));
+      if (data && data.warn) right.appendChild(el("div", "tom-warn", "⚠ " + data.warn));
 
       if (userImg) {
         var prev = el("div", "tom-preview");
@@ -173,10 +205,13 @@
         pr.appendChild(rm);
         right.appendChild(pr);
       } else {
-        var drop = el("div", "tom-drop", "📷 Click to upload a full-body photo<br><span style='font-size:11px'>or use your camera below</span>");
+        var drop = el("div", "tom-drop", "📷 Click to upload a clear, full-body photo<br><span style='font-size:11px'>JPG or PNG · well-lit · facing the camera</span>");
         var fileInput = el("input"); fileInput.type = "file"; fileInput.accept = "image/*"; fileInput.style.display = "none";
         fileInput.onchange = function () {
-          if (fileInput.files[0]) toDataUrl(fileInput.files[0], function (d) { userImg = d; render("upload"); });
+          if (fileInput.files[0]) readAndValidate(fileInput.files[0], function (d, warn) {
+            if (!d) { render("upload", { error: warn }); return; }
+            userImg = d; render("upload", warn ? { warn: warn } : undefined);
+          });
         };
         drop.onclick = function () { fileInput.click(); };
         right.appendChild(drop);
@@ -186,7 +221,14 @@
         camBtn.style.width = "100%";
         camBtn.onclick = function () { startCamera(right, function (d) { userImg = d; render("upload"); }); };
         right.appendChild(camBtn);
+
+        right.appendChild(el("div", "tom-tips",
+          "<b>Tips for the best try-on:</b><br>• Stand straight, full body in frame<br>• Bright, even lighting · plain background<br>• Avoid blurry, dark or cropped photos"));
       }
+
+      var privacy = el("div", "tom-privacy");
+      privacy.innerHTML = LOCK + "<span><b>Your privacy is protected.</b> We do <b>not</b> store your photo. It is processed securely for this try-on only and deleted immediately after.</span>";
+      right.appendChild(privacy);
 
       var go = el("button", "tom-primary", "✨ Generate Try-On");
       go.disabled = !userImg;
@@ -264,7 +306,7 @@
     }
 
     render("upload");
-    modal.appendChild(el("div", "tom-foot", "Powered by TryOnMe · Your photo is processed securely and not shared."));
+    modal.appendChild(el("div", "tom-foot", "🔒 Powered by TryOnMe · Your photo is never stored — processed securely and deleted right after your try-on."));
     document.body.appendChild(overlay);
   }
 

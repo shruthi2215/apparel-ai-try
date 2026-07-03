@@ -9,13 +9,16 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/sonner";
-import { CheckCircle2, Ban, RotateCcw, XCircle, Sliders, Search, Clock } from "lucide-react";
+import { CheckCircle2, Ban, RotateCcw, XCircle, Sliders, Search, Clock, Eye, ExternalLink, Globe, Mail, Phone, FileText, KeyRound, Activity } from "lucide-react";
 
 interface Merchant {
   id: string; name: string; website_url: string | null; status: string;
   owner_user_id: string; contact_email: string | null; created_at: string;
   rate_limit_per_min: number; monthly_quota: number; plan_id: string | null;
+  contact_name?: string | null; mobile?: string | null; gstin?: string | null;
 }
 interface Plan { id: string; name: string; slug: string; }
 
@@ -31,6 +34,7 @@ export default function MerchantsAdmin() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [busy, setBusy] = useState(false);
   const [edit, setEdit] = useState<Merchant | null>(null);
+  const [detail, setDetail] = useState<Merchant | null>(null);
   const [rl, setRl] = useState(0);
   const [mq, setMq] = useState(0);
   const [planSlug, setPlanSlug] = useState("");
@@ -121,8 +125,10 @@ export default function MerchantsAdmin() {
             {filtered.map((m) => (
               <TableRow key={m.id}>
                 <TableCell>
-                  <div className="font-medium">{m.name}</div>
-                  <div className="text-xs text-muted-foreground">{m.website_url || m.contact_email || "—"}</div>
+                  <button onClick={() => setDetail(m)} className="text-left group">
+                    <div className="font-medium group-hover:text-primary transition-colors">{m.name}</div>
+                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">{m.website_url || m.contact_email || "—"}</div>
+                  </button>
                 </TableCell>
                 <TableCell><Badge variant={statusVariant(m.status)} className="capitalize">{m.status}</Badge></TableCell>
                 <TableCell className="text-sm">{plans.find((p) => p.id === m.plan_id)?.name || "—"}</TableCell>
@@ -143,7 +149,8 @@ export default function MerchantsAdmin() {
                     {(m.status === "suspended" || m.status === "rejected") && (
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => act(m.id, "reactivate")}><RotateCcw className="w-4 h-4 mr-1" />Reactivate</Button>
                     )}
-                    <Button size="icon" variant="ghost" onClick={() => openEdit(m)}><Sliders className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" title="View details" onClick={() => setDetail(m)}><Eye className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" title="Edit limits & plan" onClick={() => openEdit(m)}><Sliders className="w-4 h-4" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -178,6 +185,92 @@ export default function MerchantsAdmin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+          {detail && (() => {
+            const used = usage[detail.id] || 0;
+            const quota = detail.monthly_quota || 0;
+            const pct = quota ? Math.min(100, Math.round((used / quota) * 100)) : 0;
+            const site = detail.website_url
+              ? (detail.website_url.startsWith("http") ? detail.website_url : `https://${detail.website_url}`)
+              : null;
+            return (
+              <>
+                <SheetHeader>
+                  <div className="flex items-center gap-2">
+                    <SheetTitle>{detail.name}</SheetTitle>
+                    <Badge variant={statusVariant(detail.status)} className="capitalize">{detail.status}</Badge>
+                  </div>
+                  <SheetDescription>
+                    {plans.find((p) => p.id === detail.plan_id)?.name || "No plan"} · joined {new Date(detail.created_at).toLocaleDateString()}
+                  </SheetDescription>
+                </SheetHeader>
+
+                <div className="mt-6 space-y-5">
+                  {site && (
+                    <a href={site} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-2 rounded-xl border border-border/60 bg-card/60 p-3 hover:border-primary/60 transition-colors">
+                      <span className="flex items-center gap-2 text-sm min-w-0">
+                        <Globe className="w-4 h-4 text-primary shrink-0" />
+                        <span className="truncate">{detail.website_url}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-primary shrink-0">Visit site <ExternalLink className="w-3.5 h-3.5" /></span>
+                    </a>
+                  )}
+
+                  <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-2 text-muted-foreground"><Activity className="w-4 h-4" /> Try-on usage this cycle</span>
+                      <span className="font-medium">{used.toLocaleString()} / {quota.toLocaleString()}</span>
+                    </div>
+                    <Progress value={pct} className="h-2" />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                      <span className="flex items-center gap-1"><KeyRound className="w-3.5 h-3.5" /> {keyCounts[detail.id] || 0} active API keys</span>
+                      <span>{detail.rate_limit_per_min}/min limit</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-sm">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Merchant details</p>
+                    <DetailRow icon={<Sliders className="w-4 h-4" />} label="Contact" value={detail.contact_name} />
+                    <DetailRow icon={<Mail className="w-4 h-4" />} label="Email" value={detail.contact_email} />
+                    <DetailRow icon={<Phone className="w-4 h-4" />} label="Mobile" value={detail.mobile} />
+                    <DetailRow icon={<FileText className="w-4 h-4" />} label="GSTIN" value={detail.gstin} />
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button className="flex-1" variant="outline" onClick={() => { const m = detail; setDetail(null); openEdit(m); }}>
+                      <Sliders className="w-4 h-4 mr-1" /> Manage
+                    </Button>
+                    {detail.status === "active" && (
+                      <Button className="flex-1" variant="outline" disabled={busy}
+                        onClick={() => act(detail.id, "suspend").then((ok) => ok && setDetail(null))}>
+                        <Ban className="w-4 h-4 mr-1" /> Suspend
+                      </Button>
+                    )}
+                    {detail.status === "pending" && (
+                      <Button className="flex-1" disabled={busy}
+                        onClick={() => act(detail.id, "approve").then((ok) => ok && setDetail(null))}>
+                        <CheckCircle2 className="w-4 h-4 mr-1" /> Approve
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: string; value?: string | null }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-border/40 last:border-0">
+      <span className="flex items-center gap-2 text-muted-foreground">{icon}{label}</span>
+      <span className="font-medium text-right truncate max-w-[200px]">{value || "—"}</span>
     </div>
   );
 }

@@ -1,14 +1,45 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Check, Zap, Crown, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
-const plans = [
-  { icon: Zap, name: "Starter", price: "₹2,999", period: "/month", description: "Perfect for small boutiques and WhatsApp sellers", features: ["Up to 500 try-ons/month", "50 product catalog", "Basic body detection", "WhatsApp integration", "Email support"], cta: "Get Started", highlighted: false, cardClass: "bg-white/80 backdrop-blur-md border-white/40", iconBg: "bg-primary/10", iconColor: "text-primary", checkBg: "bg-primary/10", checkColor: "text-primary", btnClass: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border-0" },
-  { icon: Crown, name: "Growth", price: "₹9,999", period: "/month", description: "For growing fashion brands scaling online", features: ["Up to 5,000 try-ons/month", "Unlimited catalog", "3D try-on visualization", "Shopify & Meesho integration", "Mix & match feature", "Priority support"], cta: "Start Free Trial", highlighted: true, cardClass: "bg-gradient-hero border-0 text-white", iconBg: "bg-white/20", iconColor: "text-white", checkBg: "bg-white/20", checkColor: "text-white", btnClass: "bg-white text-primary hover:bg-gold-light hover:text-gold-dark border-0" },
-  { icon: Building2, name: "Enterprise", price: "Custom", period: "", description: "For large brands, marketplaces & fashion platforms", features: ["Unlimited try-ons", "Full API access", "Custom AI model training", "Amazon & Flipkart integration", "Data insights dashboard", "Dedicated account manager"], cta: "Contact Sales", highlighted: false, cardClass: "bg-white/80 backdrop-blur-md border-white/40", iconBg: "bg-gold/12", iconColor: "text-gold-dark", checkBg: "bg-gold/10", checkColor: "text-gold-dark", btnClass: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border-0" },
+const STYLES = [
+  { icon: Zap, highlighted: false, description: "Try the full platform free for one month", cardClass: "bg-white/80 backdrop-blur-md border-white/40", iconBg: "bg-primary/10", iconColor: "text-primary", checkBg: "bg-primary/10", checkColor: "text-primary", btnClass: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border-0" },
+  { icon: Crown, highlighted: true, description: "For growing fashion brands scaling online", cardClass: "bg-gradient-hero border-0 text-white", iconBg: "bg-white/20", iconColor: "text-white", checkBg: "bg-white/20", checkColor: "text-white", btnClass: "bg-white text-primary hover:bg-gold-light hover:text-gold-dark border-0" },
+  { icon: Building2, highlighted: false, description: "For high-traffic stores & marketplaces", cardClass: "bg-white/80 backdrop-blur-md border-white/40", iconBg: "bg-gold/12", iconColor: "text-gold-dark", checkBg: "bg-gold/10", checkColor: "text-gold-dark", btnClass: "bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border-0" },
 ];
 
+interface DbPlan {
+  id: string; name: string; slug: string; price_cents: number;
+  monthly_quota: number; features: string[]; sort_order: number;
+}
+
 export default function PricingSection() {
+  const navigate = useNavigate();
+  const [dbPlans, setDbPlans] = useState<DbPlan[]>([]);
+
+  useEffect(() => {
+    supabase.from("subscription_plans").select("id,name,slug,price_cents,monthly_quota,features,sort_order")
+      .eq("is_active", true).order("sort_order")
+      .then(({ data }) => setDbPlans((data ?? []) as DbPlan[]));
+  }, []);
+
+  const plans = dbPlans.slice(0, 3).map((p, i) => {
+    const style = STYLES[i] ?? STYLES[0];
+    const free = p.price_cents === 0;
+    return {
+      ...style,
+      name: p.name,
+      price: free ? "Free" : `₹${(p.price_cents / 100).toLocaleString("en-IN")}`,
+      period: free ? "/1 month" : "/month",
+      features: [`${p.monthly_quota.toLocaleString("en-IN")} try-ons / month`, ...(p.features || [])].slice(0, 6),
+      cta: free ? "Start Free Trial" : "Get Started",
+      onClick: () => navigate(free ? "/auth" : "/merchant"),
+    };
+  });
+
   return (
     <section className="py-24 bg-muted/30 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
@@ -85,7 +116,7 @@ export default function PricingSection() {
                 </ul>
 
                 <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-                  <Button className={`w-full rounded-full font-body font-medium py-4 text-sm transition-all ${plan.btnClass}`}>
+                  <Button onClick={plan.onClick} className={`w-full rounded-full font-body font-medium py-4 text-sm transition-all ${plan.btnClass}`}>
                     {plan.cta}
                   </Button>
                 </motion.div>
