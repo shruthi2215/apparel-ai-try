@@ -64,26 +64,53 @@ serve(async (req) => {
       current_period_start: new Date().toISOString(),
       current_period_end: periodEnd.toISOString(),
     };
-    if (sub) await admin.from("merchant_subscriptions").update(payload).eq("id", sub.id);
-    else await admin.from("merchant_subscriptions").insert({ merchant_id: merchantId, ...payload });
+    let subscriptionId = sub?.id ?? null;
+    if (sub) {
+      await admin.from("merchant_subscriptions").update(payload).eq("id", sub.id);
+    } else {
+      const { data: inserted } = await admin
+        .from("merchant_subscriptions").insert({ merchant_id: merchantId, ...payload }).select("id").maybeSingle();
+      subscriptionId = inserted?.id ?? null;
+    }
     await admin.from("audit_logs").insert({
       actor_user_id: user.id, actor_email: user.email, merchant_id: merchantId,
       action: "subscription.changed", target_type: "plan", target_id: plan.slug, metadata: { status },
     });
+    return { subscriptionId, periodEnd };
+  }
+
+  async function createInvoice(subscriptionId: string | null, periodEnd: Date, invoiceStatus: string) {
+    const { data: invoice } = await admin.from("invoices").insert({
+      merchant_id: merchantId,
+      subscription_id: subscriptionId,
+      amount_cents: plan.price_cents,
+      currency: plan.currency || "inr",
+      status: invoiceStatus,
+      description: `${plan.name} — ${plan.monthly_quota.toLocaleString()} try-ons / month`,
+      period_start: new Date().toISOString(),
+      period_end: periodEnd.toISOString(),
+      paid_at: invoiceStatus === "paid" ? new Date().toISOString() : null,
+    }).select("id").maybeSingle();
+    return invoice?.id ?? null;
   }
 
   // Free plan activates instantly.
   if (plan.price_cents === 0) {
-    await applyPlan("active", null);
+    const { subscriptionId, periodEnd } = await applyPlan("active", null);
+    await createInvoice(subscriptionId, periodEnd, "paid");
     return json({ ok: true, activated: true, free: true }, 200);
   }
 
   // Paid plan — attempt Paddle checkout if configured.
   const paddleKey = Deno.env.get("PADDLE_API_KEY");
   if (!paddleKey) {
+    // Record a pending invoice so the merchant has a billing record while
+    // online checkout is being activated for the platform.
+    const { subscriptionId, periodEnd } = await applyPlan("pending", null);
+    await createInvoice(subscriptionId, periodEnd, "open");
     return json({
       ok: false, billingPending: true,
-      message: "Online checkout is being activated for this platform. Your plan request has been recorded — an admin will confirm shortly.",
+      message: "Your plan request and invoice have been recorded. Online checkout is being activated — an admin will confirm your payment shortly.",
     }, 200);
   }
 
