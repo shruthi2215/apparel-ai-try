@@ -76,6 +76,7 @@
   }
 
   var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15l-1.9-4.1L5.5 9l4.6-1.4z"/></svg>';
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 
   function el(tag, cls, html) {
     var e = document.createElement(tag);
@@ -88,6 +89,31 @@
     var r = new FileReader();
     r.onload = function () { cb(r.result); };
     r.readAsDataURL(file);
+  }
+
+  // Validate the uploaded photo so the AI gets a clear, usable image.
+  // Returns via cb(dataUrl, warning) — warning is a string or null.
+  function readAndValidate(file, cb) {
+    if (!file || !/^image\//.test(file.type)) {
+      cb(null, "Please choose an image file (JPG or PNG).");
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      cb(null, "That image is larger than 12 MB. Please upload a smaller photo.");
+      return;
+    }
+    toDataUrl(file, function (d) {
+      var probe = new Image();
+      probe.onload = function () {
+        if (probe.naturalWidth < 300 || probe.naturalHeight < 400) {
+          cb(d, "This photo looks small or low-resolution — the result may be blurry. For best quality use a clear, well-lit, full-body photo (at least 600×800).");
+        } else {
+          cb(d, null);
+        }
+      };
+      probe.onerror = function () { cb(null, "We couldn't read that image. Please try a different photo."); };
+      probe.src = d;
+    });
   }
 
   /* --------------------------- the popup --------------------------- */
