@@ -60,6 +60,11 @@
     + '.tom-bar i{display:block;height:100%;width:30%;background:linear-gradient(90deg,#7c3aed,#db2777);border-radius:9999px;animation:tomLoad 1.6s ease-in-out infinite}'
     + '@keyframes tomLoad{0%{margin-left:-30%}100%{margin-left:100%}}'
     + '.tom-err{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:13px}'
+    + '.tom-warn{background:#fffbeb;color:#b45309;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12.5px}'
+    + '.tom-tips{background:#f8fafc;border:1px solid #eef2f7;border-radius:10px;padding:10px 12px;font-size:12px;color:#475569;line-height:1.5}'
+    + '.tom-tips b{color:#0f172a}'
+    + '.tom-privacy{display:flex;align-items:flex-start;gap:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px 11px;font-size:12px;color:#15803d;line-height:1.45}'
+    + '.tom-privacy svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;color:#16a34a}'
     + '.tom-foot{padding:0 22px 18px;font-size:11px;color:#94a3b8;text-align:center}';
 
   function injectCSS() {
