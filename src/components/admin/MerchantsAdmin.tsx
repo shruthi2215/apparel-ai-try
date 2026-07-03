@@ -147,7 +147,8 @@ export default function MerchantsAdmin() {
                     {(m.status === "suspended" || m.status === "rejected") && (
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => act(m.id, "reactivate")}><RotateCcw className="w-4 h-4 mr-1" />Reactivate</Button>
                     )}
-                    <Button size="icon" variant="ghost" onClick={() => openEdit(m)}><Sliders className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" title="View details" onClick={() => setDetail(m)}><Eye className="w-4 h-4" /></Button>
+                    <Button size="icon" variant="ghost" title="Edit limits & plan" onClick={() => openEdit(m)}><Sliders className="w-4 h-4" /></Button>
                   </div>
                 </TableCell>
               </TableRow>
