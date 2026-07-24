@@ -52,6 +52,10 @@ STRICT RULES (NON-NEGOTIABLE — VIOLATIONS = FAILURE):
 - DO NOT modify sleeve type, sleeve length, neckline, garment length, silhouette, or trims.
 - DO NOT generate a "similar" outfit — it must be the SAME outfit pixel-for-pixel.
 - DO NOT add, remove, or rearrange embellishments, buttons, zippers, borders, or dupattas.
+- DO NOT change the person's pose, body position, head tilt, gaze direction, or facial expression.
+- DO NOT add, remove, or alter makeup, lipstick, eyeliner, blush, jewelry, accessories, tattoos, glasses, or piercings.
+- DO NOT retouch, smooth, whiten, reshape, or beautify skin, face, body, or hair. Keep IMAGE 1 pixel-identical outside the garment mask.
+- DO NOT change lighting, shadows, camera angle, framing, or background of IMAGE 1.
 
 TECHNICAL ENFORCEMENT:
 - Treat IMAGE 2 as a HARD CONDITIONING INPUT (reference lock, IP-Adapter style, high weight).
