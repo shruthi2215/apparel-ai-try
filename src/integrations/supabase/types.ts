@@ -639,6 +639,48 @@ export type Database = {
           },
         ]
       }
+      user_avatars: {
+        Row: {
+          avatar_asset_url: string | null
+          body_size: string
+          consent_given: boolean
+          created_at: string
+          face_data: Json
+          face_photo_path: string | null
+          gender: string
+          id: string
+          skin_tone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_asset_url?: string | null
+          body_size?: string
+          consent_given?: boolean
+          created_at?: string
+          face_data?: Json
+          face_photo_path?: string | null
+          gender: string
+          id?: string
+          skin_tone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_asset_url?: string | null
+          body_size?: string
+          consent_given?: boolean
+          created_at?: string
+          face_data?: Json
+          face_photo_path?: string | null
+          gender?: string
+          id?: string
+          skin_tone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
