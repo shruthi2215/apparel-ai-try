@@ -116,8 +116,7 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { avatar, loading: avatarLoading } = useAvatar();
-  const { saveAvatar, reload: reloadAvatar } = useAvatar();
+  const { avatar, loading: avatarLoading, saveAvatar, reload: reloadAvatar } = useAvatar();
   const [editAvatar, setEditAvatar] = useState(false);
   const [draftSize, setDraftSize] = useState<BodySize>("M");
   const [draftGender, setDraftGender] = useState<Gender>("female");
