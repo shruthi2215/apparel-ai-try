@@ -18,6 +18,7 @@ import IndrajaPage from "./pages/IndrajaPage.tsx";
 import MerchantDashboard from "./pages/MerchantDashboard.tsx";
 import ApiDocs from "./pages/ApiDocs.tsx";
 import AccountPage from "./pages/AccountPage.tsx";
+import AvatarPreviewTest from "./pages/AvatarPreviewTest.tsx";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account" element={<AccountPage />} />
+            <Route path="/__avatar-test" element={<AvatarPreviewTest />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/super-admin" element={<SuperAdminPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
