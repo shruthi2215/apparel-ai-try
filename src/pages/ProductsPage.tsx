@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TryOnModal from "@/components/TryOnModal";
+import { track } from "@/lib/analytics";
+import { useCart } from "@/hooks/useCart";
 import {
   Search, Heart, ShoppingCart, Sparkles, Star, TrendingUp
 } from "lucide-react";
@@ -30,9 +32,11 @@ export default function ProductsPage() {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [tryOnProduct, setTryOnProduct] = useState<typeof MOCK_PRODUCTS[0] | null>(null);
   const [dbProducts, setDbProducts] = useState<typeof MOCK_PRODUCTS>([]);
+  const [merchantIds, setMerchantIds] = useState<Record<string, string | null>>({});
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addToCart, count: cartCount } = useCart();
 
   useEffect(() => {
     supabase
@@ -40,6 +44,7 @@ export default function ProductsPage() {
       .select("*")
       .order("created_at", { ascending: false })
       .then(({ data }) => {
+        setMerchantIds(Object.fromEntries((data || []).map((p: any) => [p.id, p.merchant_id ?? null])));
         const mapped = (data || []).map((p: any) => ({
           id: p.id,
           name: p.name,
@@ -60,6 +65,15 @@ export default function ProductsPage() {
       });
   }, []);
 
+  // Hydrate the wishlist from the database so it survives reloads.
+  useEffect(() => {
+    if (!user) { setWishlist(new Set()); return; }
+    supabase
+      .from("wishlists")
+      .select("product_id")
+      .then(({ data }) => setWishlist(new Set((data || []).map((w: any) => w.product_id))));
+  }, [user]);
+
   const ALL_PRODUCTS = [...dbProducts, ...MOCK_PRODUCTS];
   const filtered = ALL_PRODUCTS.filter((p) => {
     const matchCat = activeCategory === "All" || p.category === activeCategory;
@@ -68,17 +82,79 @@ export default function ProductsPage() {
     return matchCat && matchSearch;
   });
 
-  const toggleWishlist = (productId: string) => {
+  const isPersisted = (id: string) => dbProducts.some((p) => p.id === id);
+
+  const toggleWishlist = async (product: typeof MOCK_PRODUCTS[0]) => {
     if (!user) { navigate("/auth"); return; }
-    setWishlist((prev) => {
-      const next = new Set(prev);
-      if (next.has(productId)) { next.delete(productId); toast({ title: "Removed from wishlist" }); }
-      else { next.add(productId); toast({ title: "Added to wishlist ❤️" }); }
-      return next;
+    const productId = product.id;
+    const merchantId = merchantIds[productId] ?? null;
+    const adding = !wishlist.has(productId);
+
+    // Demo catalog items are not real product rows, so they cannot be persisted.
+    if (!isPersisted(productId)) {
+      toast({ title: "Demo product", description: "Wishlist saving is available for live catalog products." });
+      return;
+    }
+
+    if (adding) {
+      const { error } = await supabase.from("wishlists").insert({
+        user_id: user.id, product_id: productId, merchant_id: merchantId,
+      });
+      if (error) { toast({ title: "Could not save", description: error.message, variant: "destructive" }); return; }
+      setWishlist((prev) => new Set(prev).add(productId));
+      track({
+        event_type: "wishlist_add", merchant_id: merchantId, product_id: productId,
+        product_name: product.name, category: product.category,
+      });
+      toast({ title: "Added to wishlist ❤️" });
+    } else {
+      await supabase.from("wishlists").delete().eq("product_id", productId).eq("user_id", user.id);
+      setWishlist((prev) => { const next = new Set(prev); next.delete(productId); return next; });
+      track({ event_type: "wishlist_remove", merchant_id: merchantId, product_id: productId, product_name: product.name });
+      toast({ title: "Removed from wishlist" });
+    }
+  };
+
+  const handleAddToCart = async (product: typeof MOCK_PRODUCTS[0]) => {
+    if (!user) { navigate("/auth"); return; }
+    if (!isPersisted(product.id)) {
+      toast({ title: "Demo product", description: "Cart is available for live catalog products." });
+      return;
+    }
+    const result = await addToCart({
+      productId: product.id,
+      merchantId: merchantIds[product.id] ?? null,
+      productName: product.name,
+      category: product.category,
+      size: product.sizes?.[0] ?? null,
+      color: product.colors?.[0] ?? null,
+      price: product.price,
     });
+    if (result.error) { toast({ title: "Could not add to cart", description: result.error, variant: "destructive" }); return; }
+    toast({ title: "Added to cart", description: `${product.name} — ${cartCount + 1} item(s) in cart` });
+  };
+
+  const handleCheckout = (product: typeof MOCK_PRODUCTS[0]) => {
+    if (!user) { navigate("/auth"); return; }
+    track({
+      event_type: "checkout_started",
+      merchant_id: merchantIds[product.id] ?? null,
+      product_id: product.id,
+      product_name: product.name,
+      category: product.category,
+      value_cents: Math.round(product.price * 100),
+    });
+    navigate("/account");
   };
 
   const handleTryOn = (product: typeof MOCK_PRODUCTS[0]) => {
+    track({
+      event_type: "product_view",
+      merchant_id: merchantIds[product.id] ?? null,
+      product_id: product.id,
+      product_name: product.name,
+      category: product.category,
+    });
     setTryOnProduct(product);
   };
 
