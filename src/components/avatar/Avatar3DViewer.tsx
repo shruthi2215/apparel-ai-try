@@ -33,7 +33,7 @@ function Body({ gender, bodySize, skinTone, garmentColor }: Props) {
   const yWaist = 1.0;
   const yHip = 0.88;
 
-  const armX = shoulderR + m.limbThickness * 0.85;
+  const armX = shoulderR * 0.94 + m.limbThickness * 0.5;
   const legX = hipR * 0.52;
 
   return (
