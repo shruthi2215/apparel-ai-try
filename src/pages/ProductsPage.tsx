@@ -264,12 +264,14 @@ export default function ProductsPage() {
                   <div className="flex flex-col sm:flex-row gap-1.5 mt-1.5">
                     <Button
                       variant="outline"
+                      onClick={() => handleAddToCart(product)}
                       className="flex-1 h-7 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
                     >
                       <ShoppingCart className="w-3 h-3 mr-1" /> Cart
                     </Button>
                     <Button
                       variant="outline"
+                      onClick={() => handleCheckout(product)}
                       className="flex-1 h-7 text-xs rounded-lg border-white/10 text-muted-foreground hover:text-foreground font-body"
                     >
                       Buy Now
