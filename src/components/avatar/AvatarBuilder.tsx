@@ -66,7 +66,8 @@ export default function AvatarBuilder({ initialGender, onSaved, onCancel, compac
       const check = await validatePhoto(photo);
       if (!check.ok) {
         setStep("body");
-        return fail("Photo needs improving", check.issues?.[0]?.message || "Use a clear, well-lit front-facing photo.");
+        const firstFail = check.checks.find((c) => c.severity === "fail");
+        return fail("Photo needs improving", firstFail?.detail || "Use a clear, well-lit front-facing photo.");
       }
       const generated = await getAvatarGenerationService().generate({
         photoDataUrl: photo, gender, bodySize: size, heightCm, consent, onStage: setStage,
