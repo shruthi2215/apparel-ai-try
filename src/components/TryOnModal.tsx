@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -209,6 +210,14 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
     const useColor = color || selectedColor;
     setGenerating(true);
     setTryOnImage(null);
+    const startedAt = Date.now();
+    track({
+      event_type: "tryon_started",
+      product_id: product.id,
+      product_name: product.name,
+      category: product.category,
+      color: useColor,
+    });
 
     try {
       const { data, error } = await supabase.functions.invoke("ai-tryon-image", {
@@ -224,6 +233,11 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
 
       if (error) {
         const message = error?.message || "Try-on failed";
+        track({
+          event_type: "tryon_failed", product_id: product.id, product_name: product.name,
+          category: product.category, color: useColor, status: "error",
+          duration_ms: Date.now() - startedAt, metadata: { reason: message },
+        });
         if (message.includes("credits") || message.includes("402")) {
           toast({ title: "AI Credits Needed", description: "Please add credits in Settings → Workspace → Usage.", variant: "destructive" });
         } else {
@@ -233,20 +247,44 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
       }
 
       if (data?.validationFailed) {
+        track({
+          event_type: "tryon_failed", product_id: product.id, product_name: product.name,
+          category: product.category, status: "validation_failed", duration_ms: Date.now() - startedAt,
+        });
         toast({ title: "Photo Issue", description: data.error || "Please upload a clear front-facing photo.", variant: "destructive" });
         return;
       }
       if (data?.creditError || data?.rateLimited) {
+        track({
+          event_type: "tryon_failed", product_id: product.id, product_name: product.name,
+          category: product.category, status: data.creditError ? "credit_error" : "rate_limited",
+          duration_ms: Date.now() - startedAt,
+        });
         toast({ title: data.creditError ? "Credits Needed" : "Rate Limited", description: data.error, variant: "destructive" });
         return;
       }
       if (data?.error) {
+        track({
+          event_type: "tryon_failed", product_id: product.id, product_name: product.name,
+          category: product.category, status: "error", duration_ms: Date.now() - startedAt,
+          metadata: { reason: data.error },
+        });
         toast({ title: "Error", description: data.error, variant: "destructive" });
         return;
       }
 
       setTryOnImage(data.imageUrl);
       setProgress(100);
+
+      track({
+        event_type: "tryon_completed",
+        product_id: product.id,
+        product_name: product.name,
+        category: product.category,
+        color: useColor,
+        status: "success",
+        duration_ms: Date.now() - startedAt,
+      });
 
       // Save session
       if (user) {
@@ -258,6 +296,10 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
         } catch {}
       }
     } catch (err) {
+      track({
+        event_type: "tryon_failed", product_id: product.id, product_name: product.name,
+        category: product.category, status: "exception", duration_ms: Date.now() - startedAt,
+      });
       toast({ title: "Error", description: err instanceof Error ? err.message : "Unknown error", variant: "destructive" });
     } finally {
       setGenerating(false);

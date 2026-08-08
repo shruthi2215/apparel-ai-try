@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.108.2";
 import { runTryOn, fetchImageAsDataUrl, sha256Hex } from "../_shared/tryonPrompt.ts";
+import { AI_COST_CENTS, recordEvent, recordUsage } from "../_shared/usage.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -132,14 +133,37 @@ serve(async (req) => {
     : await fetchImageAsDataUrl(String(productImage));
 
   async function log(status: string, errorCode?: string) {
+    const latency = Date.now() - startedAt;
     await admin.from("tryon_requests").insert({
       merchant_id: merchant.id,
       request_id: requestId,
       product_id: productId ? String(productId) : null,
       product_name: productName,
       status,
-      latency_ms: Date.now() - startedAt,
+      latency_ms: latency,
       error_code: errorCode ?? null,
+    });
+
+    // Tenant-scoped usage + analytics so merchant and platform dashboards read real numbers.
+    await recordUsage({
+      usageType: "tryon_generation",
+      merchantId: merchant.id,
+      quantity: 1,
+      costCents: AI_COST_CENTS.tryon_generation,
+      provider: "lovable-ai",
+      status: status === "success" ? "success" : "failed",
+      latencyMs: latency,
+      metadata: { requestId, errorCode: errorCode ?? null },
+    });
+    await recordEvent({
+      eventType: status === "success" ? "tryon_completed" : "tryon_failed",
+      merchantId: merchant.id,
+      productName,
+      category: productCategory ?? null,
+      color: selectedColor ?? null,
+      status: errorCode ?? status,
+      durationMs: latency,
+      metadata: { requestId, source: "api" },
     });
   }
 
