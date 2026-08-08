@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { AI_COST_CENTS, recordEvent, recordUsage, userIdFromRequest } from "../_shared/usage.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    const startedAt = Date.now();
+    const userId = await userIdFromRequest(req);
     const { photoDataUrl, gender, heightCm, bodySize, skinTone } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -81,7 +84,26 @@ OUTPUT: one vertical full-body image of this person only.`;
     const data = await response.json();
     const message = data.choices?.[0]?.message;
     const imageUrl = message?.images?.[0]?.image_url?.url;
-    if (!imageUrl) throw new Error("The avatar could not be generated. Please try a clearer front-facing photo.");
+    if (!imageUrl) {
+      await recordUsage({
+        usageType: "avatar_generation", userId, status: "failed",
+        provider: "lovable-ai", model: "google/gemini-3.1-flash-image",
+        costCents: AI_COST_CENTS.avatar_generation, latencyMs: Date.now() - startedAt,
+      });
+      await recordEvent({ eventType: "avatar_failed", userId, status: "no_image", durationMs: Date.now() - startedAt });
+      throw new Error("The avatar could not be generated. Please try a clearer front-facing photo.");
+    }
+
+    await recordUsage({
+      usageType: "avatar_generation", userId, status: "success",
+      provider: "lovable-ai", model: "google/gemini-3.1-flash-image",
+      costCents: AI_COST_CENTS.avatar_generation, latencyMs: Date.now() - startedAt,
+      metadata: { gender, bodySize, heightCm },
+    });
+    await recordEvent({
+      eventType: "avatar_created", userId, status: "success",
+      durationMs: Date.now() - startedAt, metadata: { gender, bodySize, heightCm },
+    });
 
     return new Response(JSON.stringify({ imageUrl, provider: "google/gemini-3.1-flash-image" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
