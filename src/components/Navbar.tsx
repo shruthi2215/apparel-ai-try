@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const baseLinks = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Products", href: "/products" },
+  { label: "Avatar Studio", href: "/avatar" },
   { label: "Virtual Try-On", href: "/try-on" },
 ];
 

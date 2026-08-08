@@ -12,7 +12,7 @@ interface Props {
   className?: string;
 }
 
-function Body({ gender, bodySize, skinTone, garmentColor }: Props) {
+export function Body({ gender, bodySize, skinTone, garmentColor }: Props) {
   const m = useMemo(() => bodyMetrics(gender, bodySize), [gender, bodySize]);
   const group = useRef<THREE.Group>(null);
 
