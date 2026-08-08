@@ -318,7 +318,7 @@ export default function AuthPage() {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="font-display text-2xl font-bold text-foreground">
-              Try On <span className="gradient-gold-text">Me</span>
+              Try<span className="gradient-gold-text">vior</span>
             </span>
           </div>
 

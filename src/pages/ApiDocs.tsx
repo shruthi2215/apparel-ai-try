@@ -47,7 +47,7 @@ export default function ApiDocs() {
         <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
           <div>
             <Badge className="mb-2">API v1</Badge>
-            <h1 className="text-3xl font-bold">TryOnMe API & SDK</h1>
+            <h1 className="text-3xl font-bold">Tryvior API & SDK</h1>
             <p className="text-muted-foreground">Add AI virtual try-on to any fashion store. REST API + drop-in widget.</p>
           </div>
           {isSuperAdmin ? (

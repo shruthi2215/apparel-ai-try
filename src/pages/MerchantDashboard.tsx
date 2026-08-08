@@ -185,7 +185,7 @@ export default function MerchantDashboard() {
             <Card className="p-8 border-border/60 backdrop-blur-xl bg-card/70">
               <div className="flex items-center gap-2 text-primary mb-2"><Sparkles className="w-5 h-5" /><span className="font-semibold">Merchant Dashboard</span></div>
               <h1 className="text-2xl font-bold mb-1">Create your merchant account</h1>
-              <p className="text-muted-foreground text-sm mb-6">Set up your business to generate API keys and start integrating TryOnMe on your store.</p>
+              <p className="text-muted-foreground text-sm mb-6">Set up your business to generate API keys and start integrating Tryvior on your store.</p>
               <div className="space-y-4">
                 <div><label className="text-sm font-medium">Business name *</label><Input value={bizName} onChange={(e) => setBizName(e.target.value)} placeholder="Acme Fashion" className="mt-1" /></div>
                 <div><label className="text-sm font-medium">Contact name *</label><Input value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Full name" className="mt-1" /></div>

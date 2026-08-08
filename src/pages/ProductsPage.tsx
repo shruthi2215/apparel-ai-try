@@ -79,7 +79,6 @@ export default function ProductsPage() {
   };
 
   const handleTryOn = (product: typeof MOCK_PRODUCTS[0]) => {
-    if (!user) { navigate("/auth"); return; }
     setTryOnProduct(product);
   };
 
@@ -179,12 +178,12 @@ export default function ProductsPage() {
                       <span className="font-body text-xs line-through text-muted-foreground">₹{product.original_price.toLocaleString()}</span>
                     )}
                   </div>
-                  {/* Try On Me button */}
+                  {/* Try Me button */}
                   <Button
                     onClick={() => handleTryOn(product)}
                     className="w-full h-9 text-xs bg-gradient-hero text-white border-0 rounded-lg font-body font-semibold hover:scale-105 transition-transform shadow-brand"
                   >
-                    <Sparkles className="w-3 h-3 mr-1.5" /> Try On Me
+                    <Sparkles className="w-3 h-3 mr-1.5" /> Try Me
                   </Button>
                   <div className="flex flex-col sm:flex-row gap-1.5 mt-1.5">
                     <Button

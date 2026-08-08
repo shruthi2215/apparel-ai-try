@@ -51,7 +51,7 @@ export default function Navbar() {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="font-display text-xl font-semibold text-foreground tracking-tight">
-              Try On <span className="gradient-gold-text">Me</span>
+              Try<span className="gradient-gold-text">vior</span>
             </span>
           </motion.button>
 
@@ -121,6 +121,13 @@ export default function Navbar() {
                   </div>
                   {profile?.display_name?.split(" ")[0] || "Profile"}
                 </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/account")}
+                  className="font-body text-muted-foreground hover:text-foreground text-sm h-9"
+                >
+                  My Avatar
+                </Button>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     onClick={() => navigate("/try-on")}
@@ -183,6 +190,12 @@ export default function Navbar() {
                     className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left flex items-center gap-2"
                   >
                     <User className="w-4 h-4" /> My Profile
+                  </button>
+                  <button
+                    onClick={() => handleNav("/account")}
+                    className="font-body text-sm text-muted-foreground hover:text-foreground py-2.5 border-b border-border text-left"
+                  >
+                    My Account & Avatar
                   </button>
                   {canSeeMerchant && (
                     <button
