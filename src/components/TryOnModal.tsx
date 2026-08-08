@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAvatar } from "@/hooks/useAvatar";
-import AvatarStage from "@/components/avatar/AvatarStage";
-import AvatarCreationFlow from "@/components/avatar/AvatarCreationFlow";
+import AvatarPortrait from "@/components/avatar/AvatarPortrait";
+import AvatarBuilder from "@/components/avatar/AvatarBuilder";
 import { BODY_SIZES, type BodySize, type FaceAnalysis, type Gender } from "@/lib/avatar";
 
 interface TryOnModalProps {
@@ -116,7 +116,7 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { avatar, loading: avatarLoading, saveAvatar, reload: reloadAvatar } = useAvatar();
+  const { avatar, avatarImageUrl, loading: avatarLoading, saveAvatar, reload: reloadAvatar } = useAvatar();
   const [editAvatar, setEditAvatar] = useState(false);
   const [draftSize, setDraftSize] = useState<BodySize>("M");
   const [draftGender, setDraftGender] = useState<Gender>("female");
@@ -202,8 +202,9 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
     setTryOnImage(null);
   };
 
-  const generateTryOn = async (color?: string) => {
-    if (!userPhoto) return;
+  const generateTryOn = async (color?: string, sourceImage?: string) => {
+    const baseImage = sourceImage || userPhoto;
+    if (!baseImage) return;
     const useColor = color || selectedColor;
     setGenerating(true);
     setTryOnImage(null);
@@ -211,7 +212,7 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
     try {
       const { data, error } = await supabase.functions.invoke("ai-tryon-image", {
         body: {
-          userImageBase64: userPhoto,
+          userImageBase64: baseImage,
           productName: product.name,
           productImageUrl: product.image_url,
           productCategory: product.category,
