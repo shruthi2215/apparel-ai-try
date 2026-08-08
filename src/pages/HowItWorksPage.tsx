@@ -62,7 +62,7 @@ export default function HowItWorksPage() {
               <span className="font-body text-sm text-primary font-semibold">AI-Powered Fashion Technology</span>
             </div>
             <h1 className="font-display text-5xl md:text-6xl font-bold text-foreground mb-4">
-              How <span className="gradient-gold-text">Try On Me</span> Works
+              How <span className="gradient-gold-text">Tryvior</span> Works
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-2xl mx-auto">
               India's most advanced virtual try-on platform — powered by AI to help you shop smarter, 

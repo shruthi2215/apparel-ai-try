@@ -93,7 +93,7 @@ export default function HeroSection() {
                   size="lg"
                   className="bg-primary text-primary-foreground font-body font-medium px-7 h-12 text-sm rounded-full shadow-soft hover:bg-primary/90 hover:shadow-md transition-all animate-pulse-soft border-0"
                 >
-                  <Upload className="w-4 h-4 mr-2" /> Try On Me
+                  <Upload className="w-4 h-4 mr-2" /> Try Me
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.97 }}>

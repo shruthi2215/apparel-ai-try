@@ -429,7 +429,7 @@ export default function TryOnPage() {
 
   // ── Share ─────────────────────────────────────────────────────────────────
   const shareOnWhatsApp = () => {
-    const text = encodeURIComponent(`Check out my virtual try-on! I tried "${selectedProduct?.name}" on Try On Me 🛍️`);
+    const text = encodeURIComponent(`Check out my virtual try-on! I tried "${selectedProduct?.name}" on Tryvior 🛍️`);
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
   const shareOnFacebook = () => {

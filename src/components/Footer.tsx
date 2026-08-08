@@ -72,7 +72,7 @@ export default function Footer() {
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-7 border-t border-white/8">
           <p className="font-body text-white/25 text-xs">
-            © 2024 Try On Me. All rights reserved. Made with ♥ in India.
+            © 2026 Tryvior. All rights reserved. Made with ♥ in India.
           </p>
           <div className="flex items-center gap-5">
             {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((item) => (
