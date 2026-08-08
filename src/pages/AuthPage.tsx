@@ -56,6 +56,34 @@ export default function AuthPage() {
     resetAll();
   };
 
+  // ── Google OAuth ──
+  const handleGoogle = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) {
+      toast({ title: "Google sign-in failed", description: error.message, variant: "destructive" });
+      setLoading(false);
+    }
+  };
+
+  // ── Resend email confirmation ──
+  const handleResendConfirmation = async () => {
+    if (!email) return;
+    setLoading(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    toast(error
+      ? { title: "Couldn't resend", description: error.message, variant: "destructive" }
+      : { title: "Confirmation email sent", description: `Check ${email} and click the link.` });
+    setLoading(false);
+  };
+
   // ── Email Login ──
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -397,6 +425,15 @@ export default function AuthPage() {
                     {loading ? "Creating..." : "Sign Up"}
                   </Button>
                 </form>
+              )}
+
+              {method === "phone" && (
+                <div className="rounded-xl border border-border bg-muted/50 p-3 mb-4">
+                  <p className="text-xs text-muted-foreground">
+                    SMS OTP is not active on this project yet. Use email or Google to continue — phone
+                    codes will start working as soon as an SMS sender is configured.
+                  </p>
+                </div>
               )}
 
               {/* Phone Login / Signup — send OTP */}
