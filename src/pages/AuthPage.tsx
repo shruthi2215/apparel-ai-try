@@ -571,6 +571,14 @@ export default function AuthPage() {
               <Button onClick={() => switchMode("login")} className="w-full h-12 bg-gradient-hero text-white font-semibold rounded-xl border-0 text-base">
                 Go to Sign In
               </Button>
+              <button
+                type="button"
+                onClick={handleResendConfirmation}
+                disabled={loading}
+                className="w-full text-center text-sm text-primary hover:underline disabled:opacity-50"
+              >
+                {loading ? "Sending…" : "Resend confirmation email"}
+              </button>
             </div>
           )}
 
