@@ -359,13 +359,32 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                   </p>
                 ) : avatar ? (
                   <>
-                    <AvatarStage
-                      gender={draftGender}
-                      bodySize={draftSize}
-                      skinTone={(avatar.face_data as FaceAnalysis)?.skinTone || avatar.skin_tone || "#d8b094"}
-                      garmentColor={COLOR_PALETTE[selectedColor] || "#3f3f46"}
-                      showControls={false}
-                    />
+                    {tryOnImage ? (
+                      <div className="rounded-2xl overflow-hidden border border-border bg-muted">
+                        <img src={tryOnImage} alt={`Your avatar wearing ${product.name}`} className="w-full object-contain" />
+                      </div>
+                    ) : generating ? (
+                      <div className="space-y-4 py-4">
+                        <div className="flex flex-col items-center">
+                          <div className="relative mb-4">
+                            <div className="w-14 h-14 rounded-full border-[3px] border-primary/15 border-t-primary animate-spin" />
+                            <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-primary animate-pulse" />
+                          </div>
+                          <p className="font-body text-sm text-primary font-medium text-center">
+                            {LOADING_MESSAGES[loadingMsgIndex]}
+                          </p>
+                        </div>
+                        <Progress value={progress} className="h-2" />
+                      </div>
+                    ) : (
+                      <AvatarPortrait
+                        imageUrl={avatarImageUrl}
+                        gender={draftGender}
+                        bodySize={draftSize}
+                        heightCm={avatar.height_cm}
+                      />
+                    )}
+
                     {product.colors.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {product.colors.map((c) => (
@@ -379,10 +398,30 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                         ))}
                       </div>
                     )}
+
+                    {!tryOnImage ? (
+                      <Button
+                        onClick={() => avatarImageUrl && generateTryOn(undefined, avatarImageUrl)}
+                        disabled={generating || !avatarImageUrl}
+                        className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-body font-semibold text-sm"
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" /> Try this on my avatar
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => setTryOnImage(null)}
+                        variant="outline"
+                        className="w-full h-10 rounded-xl border-primary/25 text-primary font-body text-sm"
+                      >
+                        <RotateCcw className="w-4 h-4 mr-2" /> Back to my avatar
+                      </Button>
+                    )}
+
                     <div className="rounded-xl border border-border bg-card p-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <p className="font-body text-xs text-muted-foreground">
                           Saved avatar · {draftGender === "female" ? "Female" : "Male"} · Size {draftSize}
+                          {avatar.height_cm ? ` · ${avatar.height_cm} cm` : ""}
                         </p>
                         <button
                           onClick={() => setEditAvatar((v) => !v)}
@@ -428,15 +467,22 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                           >
                             {savingAvatar ? "Saving…" : "Save avatar"}
                           </Button>
+                          <Button
+                            onClick={() => setRebuild(true)}
+                            variant="outline"
+                            className="w-full h-9 rounded-lg font-body text-xs"
+                          >
+                            <Camera className="w-3.5 h-3.5 mr-1.5" /> Rebuild from a new photo
+                          </Button>
                         </div>
                       )}
                       <p className="font-body text-[11px] text-muted-foreground">
-                        Created once — it loads automatically for every future try-on. Zoom to check the drape; the avatar stays front-facing.
+                        Created once — it loads automatically for every future try-on.
                       </p>
                     </div>
                   </>
                 ) : (
-                  <AvatarCreationFlow onSaved={() => { reloadAvatar(); setMode("avatar"); }} onCancel={() => setMode(null)} />
+                  <AvatarBuilder onSaved={() => { reloadAvatar(); setRebuild(false); setMode("avatar"); }} onCancel={() => setMode(null)} compact />
                 )}
               </div>
             ) : (
