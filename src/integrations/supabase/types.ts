@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          category: string | null
+          color: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          duration_ms: number | null
+          event_type: string
+          id: string
+          merchant_id: string | null
+          metadata: Json
+          product_id: string | null
+          product_name: string | null
+          session_id: string | null
+          size: string | null
+          status: string | null
+          user_id: string | null
+          value_cents: number | null
+        }
+        Insert: {
+          category?: string | null
+          color?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          duration_ms?: number | null
+          event_type: string
+          id?: string
+          merchant_id?: string | null
+          metadata?: Json
+          product_id?: string | null
+          product_name?: string | null
+          session_id?: string | null
+          size?: string | null
+          status?: string | null
+          user_id?: string | null
+          value_cents?: number | null
+        }
+        Update: {
+          category?: string | null
+          color?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          duration_ms?: number | null
+          event_type?: string
+          id?: string
+          merchant_id?: string | null
+          metadata?: Json
+          product_id?: string | null
+          product_name?: string | null
+          session_id?: string | null
+          size?: string | null
+          status?: string | null
+          user_id?: string | null
+          value_cents?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analytics_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       api_keys: {
         Row: {
           created_at: string
@@ -99,6 +174,70 @@ export type Database = {
           target_type?: string | null
         }
         Relationships: []
+      }
+      cart_items: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          merchant_id: string | null
+          price: number | null
+          product_id: string | null
+          quantity: number
+          size: string | null
+          updated_at: string
+          user_id: string
+          variant_id: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          merchant_id?: string | null
+          price?: number | null
+          product_id?: string | null
+          quantity?: number
+          size?: string | null
+          updated_at?: string
+          user_id: string
+          variant_id?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          merchant_id?: string | null
+          price?: number | null
+          product_id?: string | null
+          quantity?: number
+          size?: string | null
+          updated_at?: string
+          user_id?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invoices: {
         Row: {
@@ -330,11 +469,62 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          audience: string
+          body: string | null
+          category: string | null
+          created_at: string
+          id: string
+          link: string | null
+          merchant_id: string | null
+          read_at: string | null
+          severity: string
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          audience?: string
+          body?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          merchant_id?: string | null
+          read_at?: string | null
+          severity?: string
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          audience?: string
+          body?: string | null
+          category?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          merchant_id?: string | null
+          read_at?: string | null
+          severity?: string
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           color: string | null
           created_at: string
           id: string
+          merchant_id: string | null
           price: number
           product_id: string | null
           product_image: string | null
@@ -349,6 +539,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          merchant_id?: string | null
           price: number
           product_id?: string | null
           product_image?: string | null
@@ -363,6 +554,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          merchant_id?: string | null
           price?: number
           product_id?: string | null
           product_image?: string | null
@@ -375,7 +567,71 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "orders_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          merchant_id: string | null
+          price: number | null
+          product_id: string
+          size: string | null
+          sku: string | null
+          stock_count: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          merchant_id?: string | null
+          price?: number | null
+          product_id: string
+          size?: string | null
+          sku?: string | null
+          stock_count?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          merchant_id?: string | null
+          price?: number | null
+          product_id?: string
+          size?: string | null
+          sku?: string | null
+          stock_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
@@ -394,6 +650,7 @@ export type Database = {
           image_url: string | null
           in_stock: boolean
           is_trending: boolean
+          merchant_id: string | null
           name: string
           original_price: number | null
           price: number
@@ -415,6 +672,7 @@ export type Database = {
           image_url?: string | null
           in_stock?: boolean
           is_trending?: boolean
+          merchant_id?: string | null
           name: string
           original_price?: number | null
           price?: number
@@ -436,6 +694,7 @@ export type Database = {
           image_url?: string | null
           in_stock?: boolean
           is_trending?: boolean
+          merchant_id?: string | null
           name?: string
           original_price?: number | null
           price?: number
@@ -447,7 +706,15 @@ export type Database = {
           try_on_image_url?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -548,12 +815,66 @@ export type Database = {
         }
         Relationships: []
       }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          merchant_id: string | null
+          message: string
+          priority: string
+          requester_email: string | null
+          resolution: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          merchant_id?: string | null
+          message: string
+          priority?: string
+          requester_email?: string | null
+          resolution?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          merchant_id?: string | null
+          message?: string
+          priority?: string
+          requester_email?: string | null
+          resolution?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       try_on_sessions: {
         Row: {
           ai_analysis: Json | null
           ai_suggestions: string[] | null
           created_at: string
           id: string
+          merchant_id: string | null
           product_id: string | null
           result_photo_url: string | null
           status: string
@@ -566,6 +887,7 @@ export type Database = {
           ai_suggestions?: string[] | null
           created_at?: string
           id?: string
+          merchant_id?: string | null
           product_id?: string | null
           result_photo_url?: string | null
           status?: string
@@ -578,6 +900,7 @@ export type Database = {
           ai_suggestions?: string[] | null
           created_at?: string
           id?: string
+          merchant_id?: string | null
           product_id?: string | null
           result_photo_url?: string | null
           status?: string
@@ -586,6 +909,13 @@ export type Database = {
           user_photo_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "try_on_sessions_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "try_on_sessions_product_id_fkey"
             columns: ["product_id"]
@@ -639,6 +969,59 @@ export type Database = {
           },
         ]
       }
+      usage_records: {
+        Row: {
+          cost_cents: number
+          created_at: string
+          id: string
+          latency_ms: number | null
+          merchant_id: string | null
+          metadata: Json
+          model: string | null
+          provider: string | null
+          quantity: number
+          status: string
+          usage_type: string
+          user_id: string | null
+        }
+        Insert: {
+          cost_cents?: number
+          created_at?: string
+          id?: string
+          latency_ms?: number | null
+          merchant_id?: string | null
+          metadata?: Json
+          model?: string | null
+          provider?: string | null
+          quantity?: number
+          status?: string
+          usage_type: string
+          user_id?: string | null
+        }
+        Update: {
+          cost_cents?: number
+          created_at?: string
+          id?: string
+          latency_ms?: number | null
+          merchant_id?: string | null
+          metadata?: Json
+          model?: string | null
+          provider?: string | null
+          quantity?: number
+          status?: string
+          usage_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_records_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_avatars: {
         Row: {
           avatar_asset_url: string | null
@@ -684,6 +1067,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_measurements: {
+        Row: {
+          bust_cm: number | null
+          consent_given: boolean
+          created_at: string
+          height_cm: number | null
+          hip_cm: number | null
+          id: string
+          inseam_cm: number | null
+          preferred_size: string | null
+          shoulder_cm: number | null
+          updated_at: string
+          user_id: string
+          waist_cm: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          bust_cm?: number | null
+          consent_given?: boolean
+          created_at?: string
+          height_cm?: number | null
+          hip_cm?: number | null
+          id?: string
+          inseam_cm?: number | null
+          preferred_size?: string | null
+          shoulder_cm?: number | null
+          updated_at?: string
+          user_id: string
+          waist_cm?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          bust_cm?: number | null
+          consent_given?: boolean
+          created_at?: string
+          height_cm?: number | null
+          hip_cm?: number | null
+          id?: string
+          inseam_cm?: number | null
+          preferred_size?: string | null
+          shoulder_cm?: number | null
+          updated_at?: string
+          user_id?: string
+          waist_cm?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -709,22 +1140,32 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          merchant_id: string | null
           product_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          merchant_id?: string | null
           product_id: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          merchant_id?: string | null
           product_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "wishlists_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "wishlists_product_id_fkey"
             columns: ["product_id"]
