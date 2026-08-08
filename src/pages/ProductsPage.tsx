@@ -79,7 +79,6 @@ export default function ProductsPage() {
   };
 
   const handleTryOn = (product: typeof MOCK_PRODUCTS[0]) => {
-    if (!user) { navigate("/auth"); return; }
     setTryOnProduct(product);
   };
 
