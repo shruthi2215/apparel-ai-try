@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useAvatar } from "@/hooks/useAvatar";
-import Avatar3DViewer from "@/components/avatar/Avatar3DViewer";
-import AvatarCreationFlow from "@/components/avatar/AvatarCreationFlow";
+import AvatarPortrait from "@/components/avatar/AvatarPortrait";
+import AvatarBuilder from "@/components/avatar/AvatarBuilder";
 import { useToast } from "@/hooks/use-toast";
 import type { BodySize, FaceAnalysis, Gender } from "@/lib/avatar";
 import { Pencil, Trash2, Sparkles, AlertTriangle, ShieldCheck, Settings } from "lucide-react";
@@ -15,7 +15,7 @@ export default function AccountPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { avatar, loading, deleteAvatar } = useAvatar();
+  const { avatar, avatarImageUrl, loading, deleteAvatar, reload } = useAvatar();
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -62,19 +62,20 @@ export default function AccountPage() {
             </div>
           ) : editing || !avatar ? (
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <AvatarCreationFlow
+              <AvatarBuilder
                 initialGender={avatar?.gender as Gender | undefined}
-                initialSize={avatar?.body_size as BodySize | undefined}
-                onSaved={() => setEditing(false)}
+                onSaved={() => { reload(); setEditing(false); }}
                 onCancel={avatar ? () => setEditing(false) : undefined}
+                compact
               />
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
-              <Avatar3DViewer
+              <AvatarPortrait
+                imageUrl={avatarImageUrl}
                 gender={avatar.gender as Gender}
                 bodySize={avatar.body_size as BodySize}
-                skinTone={skinTone}
+                heightCm={avatar.height_cm}
               />
 
               <div className="rounded-2xl border border-border bg-card p-6 shadow-sm flex flex-col">
@@ -87,6 +88,7 @@ export default function AccountPage() {
                   {[
                     ["Body template", avatar.gender === "female" ? "Female" : "Male"],
                     ["Body size", avatar.body_size],
+                    ["Height", avatar.height_cm ? `${avatar.height_cm} cm` : "Not set"],
                     ["Skin tone", skinTone],
                     ["Last updated", new Date(avatar.updated_at).toLocaleDateString()],
                   ].map(([k, v]) => (
