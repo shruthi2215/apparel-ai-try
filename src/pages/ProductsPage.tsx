@@ -224,7 +224,7 @@ export default function ProductsPage() {
                     </div>
                   )}
                   <button
-                    onClick={() => toggleWishlist(product.id)}
+                    onClick={() => toggleWishlist(product)}
                     className={`absolute top-2 right-2 w-8 h-8 rounded-full glass-card flex items-center justify-center transition-colors ${
                       wishlist.has(product.id) ? "text-red-500" : "text-muted-foreground"
                     }`}
