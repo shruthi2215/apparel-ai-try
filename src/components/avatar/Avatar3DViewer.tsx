@@ -140,6 +140,7 @@ export default function Avatar3DViewer(props: Props) {
         </Suspense>
         <OrbitControls
           enablePan={false}
+          enableRotate={false}
           minDistance={2.2}
           maxDistance={5}
           minPolarAngle={Math.PI / 4}

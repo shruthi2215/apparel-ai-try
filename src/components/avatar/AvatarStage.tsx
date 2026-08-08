@@ -4,7 +4,7 @@ import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { Body } from "@/components/avatar/Avatar3DViewer";
 import type { BodySize, Gender } from "@/lib/avatar";
 import { Button } from "@/components/ui/button";
-import { Download, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { Download, ZoomIn, ZoomOut } from "lucide-react";
 
 type ViewName = "front" | "side" | "back";
 
@@ -30,7 +30,6 @@ export default function AvatarStage({
   const controls = useRef<React.ComponentRef<typeof OrbitControls> | null>(null);
   const canvasEl = useRef<HTMLCanvasElement | null>(null);
   const [view, setView] = useState<ViewName>("front");
-  const [autoRotate, setAutoRotate] = useState(false);
 
   const setPreset = useCallback((name: ViewName) => {
     setView(name);
@@ -82,8 +81,8 @@ export default function AvatarStage({
           <OrbitControls
             ref={controls}
             enablePan={false}
-            autoRotate={autoRotate}
-            autoRotateSpeed={1.1}
+            enableRotate={false}
+            autoRotate={false}
             minDistance={2.2}
             maxDistance={5}
             minPolarAngle={Math.PI / 4}
@@ -116,15 +115,6 @@ export default function AvatarStage({
           </Button>
           <Button variant="outline" size="sm" onClick={() => zoom(1.22)} className="rounded-xl font-body text-xs" aria-label="Zoom out">
             <ZoomOut className="w-3.5 h-3.5 mr-1.5" /> Zoom out
-          </Button>
-          <Button
-            variant={autoRotate ? "default" : "outline"}
-            size="sm"
-            onClick={() => setAutoRotate((v) => !v)}
-            className="rounded-xl font-body text-xs"
-            aria-pressed={autoRotate}
-          >
-            <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> {autoRotate ? "Stop rotate" : "Rotate 360°"}
           </Button>
           <Button variant="outline" size="sm" onClick={download} className="rounded-xl font-body text-xs">
             <Download className="w-3.5 h-3.5 mr-1.5" /> Download

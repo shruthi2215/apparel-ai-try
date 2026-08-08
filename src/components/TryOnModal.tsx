@@ -10,9 +10,9 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAvatar } from "@/hooks/useAvatar";
-import Avatar3DViewer from "@/components/avatar/Avatar3DViewer";
+import AvatarStage from "@/components/avatar/AvatarStage";
 import AvatarCreationFlow from "@/components/avatar/AvatarCreationFlow";
-import type { BodySize, FaceAnalysis, Gender } from "@/lib/avatar";
+import { BODY_SIZES, type BodySize, type FaceAnalysis, type Gender } from "@/lib/avatar";
 
 interface TryOnModalProps {
   open: boolean;
@@ -116,7 +116,40 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { avatar, loading: avatarLoading } = useAvatar();
+  const { avatar, loading: avatarLoading, saveAvatar, reload: reloadAvatar } = useAvatar();
+  const [editAvatar, setEditAvatar] = useState(false);
+  const [draftSize, setDraftSize] = useState<BodySize>("M");
+  const [draftGender, setDraftGender] = useState<Gender>("female");
+  const [savingAvatar, setSavingAvatar] = useState(false);
+
+  useEffect(() => {
+    if (avatar) {
+      setDraftSize(avatar.body_size as BodySize);
+      setDraftGender(avatar.gender as Gender);
+    }
+  }, [avatar?.id, avatar?.body_size, avatar?.gender]);
+
+  const saveAvatarEdits = async () => {
+    if (!avatar) return;
+    setSavingAvatar(true);
+    try {
+      await saveAvatar({
+        gender: draftGender,
+        bodySize: draftSize,
+        face: avatar.face_data as FaceAnalysis,
+        photoFile: null,
+        assetUrl: avatar.avatar_asset_url,
+        consent: avatar.consent_given,
+      });
+      await reloadAvatar();
+      setEditAvatar(false);
+      toast({ title: "Avatar updated", description: "Your saved avatar is reused on every try-on." });
+    } catch (err) {
+      toast({ title: "Couldn't save", description: err instanceof Error ? err.message : undefined, variant: "destructive" });
+    } finally {
+      setSavingAvatar(false);
+    }
+  };
 
   const isInnerwear = INNERWEAR_CATEGORIES.some(
     (cat) => product.category.toLowerCase() === cat.toLowerCase()
@@ -325,11 +358,12 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                   </p>
                 ) : avatar ? (
                   <>
-                    <Avatar3DViewer
-                      gender={avatar.gender as Gender}
-                      bodySize={avatar.body_size as BodySize}
+                    <AvatarStage
+                      gender={draftGender}
+                      bodySize={draftSize}
                       skinTone={(avatar.face_data as FaceAnalysis)?.skinTone || avatar.skin_tone || "#d8b094"}
                       garmentColor={COLOR_PALETTE[selectedColor] || "#3f3f46"}
+                      showControls={false}
                     />
                     {product.colors.length > 0 && (
                       <div className="flex flex-wrap gap-2">
@@ -344,12 +378,64 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                         ))}
                       </div>
                     )}
-                    <p className="font-body text-xs text-muted-foreground">
-                      Rotate and zoom to check the drape. Size {avatar.body_size} — change it in My Account.
-                    </p>
+                    <div className="rounded-xl border border-border bg-card p-3 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <p className="font-body text-xs text-muted-foreground">
+                          Saved avatar · {draftGender === "female" ? "Female" : "Male"} · Size {draftSize}
+                        </p>
+                        <button
+                          onClick={() => setEditAvatar((v) => !v)}
+                          className="font-body text-xs text-primary hover:underline"
+                        >
+                          {editAvatar ? "Close" : "Modify"}
+                        </button>
+                      </div>
+
+                      {editAvatar && (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-2">
+                            {(["female", "male"] as Gender[]).map((g) => (
+                              <button
+                                key={g}
+                                onClick={() => setDraftGender(g)}
+                                aria-pressed={draftGender === g}
+                                className={`rounded-lg border px-3 py-2 font-body text-xs capitalize transition-colors ${
+                                  draftGender === g ? "border-primary bg-primary/5 text-foreground" : "border-border text-muted-foreground"
+                                }`}
+                              >
+                                {g}
+                              </button>
+                            ))}
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-body text-xs text-muted-foreground">Body size</span>
+                              <span className="font-body text-xs font-semibold text-primary">{draftSize}</span>
+                            </div>
+                            <input
+                              type="range" min={0} max={BODY_SIZES.length - 1} step={1}
+                              aria-label="Body size"
+                              value={BODY_SIZES.indexOf(draftSize)}
+                              onChange={(e) => setDraftSize(BODY_SIZES[Number(e.target.value)])}
+                              className="w-full accent-primary"
+                            />
+                          </div>
+                          <Button
+                            onClick={saveAvatarEdits}
+                            disabled={savingAvatar}
+                            className="w-full h-9 rounded-lg bg-primary text-primary-foreground font-body text-xs"
+                          >
+                            {savingAvatar ? "Saving…" : "Save avatar"}
+                          </Button>
+                        </div>
+                      )}
+                      <p className="font-body text-[11px] text-muted-foreground">
+                        Created once — it loads automatically for every future try-on. Zoom to check the drape; the avatar stays front-facing.
+                      </p>
+                    </div>
                   </>
                 ) : (
-                  <AvatarCreationFlow onSaved={() => setMode("avatar")} onCancel={() => setMode(null)} />
+                  <AvatarCreationFlow onSaved={() => { reloadAvatar(); setMode("avatar"); }} onCancel={() => setMode(null)} />
                 )}
               </div>
             ) : (
