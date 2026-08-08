@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.expire-api-keys]
 verify_jwt = false
+
+[functions.generate-avatar]
+verify_jwt = false

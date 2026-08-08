@@ -5,6 +5,15 @@ export const BODY_SIZES = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"
 export type BodySize = (typeof BODY_SIZES)[number];
 export type Gender = "male" | "female";
 
+export const HEIGHT_MIN_CM = 140;
+export const HEIGHT_MAX_CM = 200;
+export const DEFAULT_HEIGHT_CM = 165;
+
+export const cmToFeet = (cm: number) => {
+  const inches = Math.round(cm / 2.54);
+  return `${Math.floor(inches / 12)}'${inches % 12}"`;
+};
+
 export interface FaceAnalysis {
   skinTone: string;          // hex
   brightness: number;        // 0..1
@@ -18,6 +27,7 @@ export interface AvatarRecord {
   user_id: string;
   gender: Gender;
   body_size: BodySize;
+  height_cm: number | null;
   skin_tone: string | null;
   face_data: FaceAnalysis | Record<string, unknown>;
   face_photo_path: string | null;

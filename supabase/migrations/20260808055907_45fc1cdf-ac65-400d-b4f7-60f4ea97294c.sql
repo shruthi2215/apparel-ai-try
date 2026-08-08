@@ -1,0 +1,1 @@
+ALTER TABLE public.user_avatars ADD COLUMN IF NOT EXISTS height_cm integer;
