@@ -179,7 +179,7 @@ export default function ProductsPage() {
                       <span className="font-body text-xs line-through text-muted-foreground">₹{product.original_price.toLocaleString()}</span>
                     )}
                   </div>
-                  {/* Try On Me button */}
+                  {/* Try Me button */}
                   <Button
                     onClick={() => handleTryOn(product)}
                     className="w-full h-9 text-xs bg-gradient-hero text-white border-0 rounded-lg font-body font-semibold hover:scale-105 transition-transform shadow-brand"

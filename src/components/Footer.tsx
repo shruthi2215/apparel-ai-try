@@ -25,7 +25,7 @@ export default function Footer() {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="font-display text-xl font-medium text-white">
-                Try On <span className="gradient-gold-text">Me</span>
+                Try<span className="gradient-gold-text">vior</span>
               </span>
             </motion.div>
             <p className="font-body text-white/40 text-sm leading-relaxed mb-5 text-pretty">
