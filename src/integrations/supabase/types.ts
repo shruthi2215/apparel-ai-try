@@ -648,6 +648,7 @@ export type Database = {
           face_data: Json
           face_photo_path: string | null
           gender: string
+          height_cm: number | null
           id: string
           skin_tone: string | null
           updated_at: string
@@ -661,6 +662,7 @@ export type Database = {
           face_data?: Json
           face_photo_path?: string | null
           gender: string
+          height_cm?: number | null
           id?: string
           skin_tone?: string | null
           updated_at?: string
@@ -674,6 +676,7 @@ export type Database = {
           face_data?: Json
           face_photo_path?: string | null
           gender?: string
+          height_cm?: number | null
           id?: string
           skin_tone?: string | null
           updated_at?: string
