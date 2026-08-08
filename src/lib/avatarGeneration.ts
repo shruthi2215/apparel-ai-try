@@ -3,14 +3,15 @@
 // implementing AvatarGenerationService and registering it below. The UI never
 // talks to a provider directly, and never fabricates a finished result.
 
+import { supabase } from "@/integrations/supabase/client";
 import { analyzeFacePhoto, type BodySize, type FaceAnalysis, type Gender } from "@/lib/avatar";
 
 export const GENERATION_STAGES = [
   { id: "analyze", label: "Analysing your photo" },
-  { id: "body", label: "Building your body model" },
-  { id: "face", label: "Creating facial details" },
-  { id: "materials", label: "Generating realistic materials" },
-  { id: "finalize", label: "Preparing your Tryvior avatar" },
+  { id: "body", label: "Building your body from your height & size" },
+  { id: "face", label: "Preserving your facial identity" },
+  { id: "materials", label: "Rendering realistic skin and hair" },
+  { id: "finalize", label: "Placing your avatar on the try-on platform" },
 ] as const;
 
 export type StageId = (typeof GENERATION_STAGES)[number]["id"];
@@ -19,6 +20,7 @@ export interface GenerationRequest {
   photoDataUrl: string;
   gender: Gender;
   bodySize: BodySize;
+  heightCm?: number | null;
   /** Caller consent — providers must refuse without it. */
   consent: boolean;
   onStage?: (stage: StageId) => void;
@@ -65,41 +67,55 @@ export const TRYON_RIG: AvatarRig = {
 };
 
 /**
- * Parametric provider: derives identity signals (skin tone, facial proportion
- * hints) from the real uploaded photo and drives the WebGL body template.
- * Clearly flagged as demo — it does not fabricate a photoreal mesh.
+ * Photorealistic provider: sends the uploaded photo to the Tryvior avatar
+ * backend, which renders a front-view, full-body human avatar that preserves
+ * the person's face, skin tone and proportions.
  */
-class ParametricAvatarProvider implements AvatarGenerationService {
-  readonly id = "tryvior-parametric-preview";
-  readonly isDemo = true;
+class PhotorealAvatarProvider implements AvatarGenerationService {
+  readonly id = "tryvior-photoreal";
+  readonly isDemo = false;
 
   async generate(req: GenerationRequest): Promise<GeneratedAvatar> {
     if (!req.consent) throw new Error("Consent is required before generating an avatar.");
     req.onStage?.("analyze");
     const face = await analyzeFacePhoto(req.photoDataUrl);
     req.onStage?.("body");
-    await wait(700);
+
+    const { data, error } = await supabase.functions.invoke("generate-avatar", {
+      body: {
+        photoDataUrl: req.photoDataUrl,
+        gender: req.gender,
+        bodySize: req.bodySize,
+        heightCm: req.heightCm ?? null,
+        skinTone: face.skinTone,
+      },
+    });
+
+    if (error) throw new Error(error.message || "Avatar generation failed. Please try again.");
+    if (data?.creditError) throw new Error(data.error || "AI credits exhausted.");
+    if (data?.error) throw new Error(data.error);
+    const imageUrl: string | undefined = data?.imageUrl;
+    if (!imageUrl) throw new Error("No avatar image was returned. Please try a clearer front-facing photo.");
+
     req.onStage?.("face");
-    await wait(700);
     req.onStage?.("materials");
-    await wait(600);
     req.onStage?.("finalize");
-    await wait(500);
+
     return {
-      assetUrl: null,
+      assetUrl: imageUrl,
       face,
       gender: req.gender,
       bodySize: req.bodySize,
       rig: TRYON_RIG,
-      provider: this.id,
-      isDemo: true,
+      provider: data?.provider || this.id,
+      isDemo: false,
     };
   }
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-let service: AvatarGenerationService = new ParametricAvatarProvider();
+let service: AvatarGenerationService = new PhotorealAvatarProvider();
 
 /** Register the production provider once the AI API is connected. */
 export function setAvatarGenerationService(next: AvatarGenerationService) {
