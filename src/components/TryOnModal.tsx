@@ -9,6 +9,10 @@ import {
   RotateCcw, Trash2, Palette,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAvatar } from "@/hooks/useAvatar";
+import Avatar3DViewer from "@/components/avatar/Avatar3DViewer";
+import AvatarCreationFlow from "@/components/avatar/AvatarCreationFlow";
+import type { BodySize, FaceAnalysis, Gender } from "@/lib/avatar";
 
 interface TryOnModalProps {
   open: boolean;
@@ -106,11 +110,13 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
   const [loadingMsgIndex, setLoadingMsgIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [wishlisted, setWishlisted] = useState(false);
+  const [mode, setMode] = useState<null | "photo" | "avatar">(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { avatar, loading: avatarLoading } = useAvatar();
 
   const isInnerwear = INNERWEAR_CATEGORIES.some(
     (cat) => product.category.toLowerCase() === cat.toLowerCase()
@@ -122,6 +128,7 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
     setTryOnImage(null);
     setProgress(0);
     setLoadingMsgIndex(0);
+    setMode(null);
   }, [product.id]);
 
   // Animated loading messages
@@ -266,10 +273,96 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
               <p className="font-body text-xs text-muted-foreground">Try-on is not available for this category due to privacy policy.</p>
             </div>
           ) : (
+            mode === null ? (
+              /* Step 1 — how do you want to try this on? */
+              <div className="space-y-3">
+                <p className="font-body text-sm font-medium text-foreground">How would you like to try this on?</p>
+                <button
+                  onClick={() => setMode("photo")}
+                  className="w-full text-left rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <Camera className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-body text-sm font-semibold text-foreground">Upload your photo</p>
+                      <p className="font-body text-xs text-muted-foreground">Quick try-on for this session only.</p>
+                    </div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setMode("avatar")}
+                  className="w-full text-left rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:shadow-sm transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <div>
+                      <p className="font-body text-sm font-semibold text-foreground">
+                        {avatar ? "Use my saved 3D avatar" : "Create your 3D avatar"}
+                      </p>
+                      <p className="font-body text-xs text-muted-foreground">
+                        {avatar
+                          ? `${avatar.gender === "female" ? "Female" : "Male"} · Size ${avatar.body_size} · saved to your account`
+                          : "Saved once and reused on every visit."}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            ) : mode === "avatar" ? (
+              /* Step 1b — 3D avatar try-on */
+              <div className="space-y-4">
+                <button
+                  onClick={() => setMode(null)}
+                  className="font-body text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Back
+                </button>
+                {avatarLoading ? (
+                  <p className="font-body text-sm text-muted-foreground py-6 text-center">Loading your avatar…</p>
+                ) : !user ? (
+                  <p className="font-body text-sm text-muted-foreground py-6 text-center">
+                    Sign in to create and save a 3D avatar.
+                  </p>
+                ) : avatar ? (
+                  <>
+                    <Avatar3DViewer
+                      gender={avatar.gender as Gender}
+                      bodySize={avatar.body_size as BodySize}
+                      skinTone={(avatar.face_data as FaceAnalysis)?.skinTone || avatar.skin_tone || "#d8b094"}
+                      garmentColor={COLOR_PALETTE[selectedColor] || "#3f3f46"}
+                    />
+                    {product.colors.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {product.colors.map((c) => (
+                          <button
+                            key={c}
+                            onClick={() => setSelectedColor(c)}
+                            title={c}
+                            className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${selectedColor === c ? "border-foreground scale-110 shadow-sm" : "border-transparent"}`}
+                            style={{ backgroundColor: COLOR_PALETTE[c] || "#aaa" }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    <p className="font-body text-xs text-muted-foreground">
+                      Rotate and zoom to check the drape. Size {avatar.body_size} — change it in My Account.
+                    </p>
+                  </>
+                ) : (
+                  <AvatarCreationFlow onSaved={() => setMode("avatar")} onCancel={() => setMode(null)} />
+                )}
+              </div>
+            ) : (
             <>
               {/* Upload section */}
               {!userPhoto ? (
                 <div className="space-y-3">
+                  <button
+                    onClick={() => setMode(null)}
+                    className="font-body text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" /> Back
+                  </button>
                   <p className="font-body text-sm text-foreground font-medium">Upload your photo</p>
                   <p className="font-body text-xs text-muted-foreground">Clear, front-facing photo with good lighting works best.</p>
                   <div
@@ -414,6 +507,7 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                 </div>
               ) : null}
             </>
+            )
           )}
 
           {/* Privacy notice */}
