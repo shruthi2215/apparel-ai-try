@@ -121,6 +121,7 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
   const [draftSize, setDraftSize] = useState<BodySize>("M");
   const [draftGender, setDraftGender] = useState<Gender>("female");
   const [savingAvatar, setSavingAvatar] = useState(false);
+  const [rebuild, setRebuild] = useState(false);
 
   useEffect(() => {
     if (avatar) {
@@ -331,19 +332,19 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                     <Sparkles className="w-5 h-5 text-primary" />
                     <div>
                       <p className="font-body text-sm font-semibold text-foreground">
-                        {avatar ? "Use my saved 3D avatar" : "Create your 3D avatar"}
+                        {avatar ? "Use my saved avatar" : "Create my avatar from a photo"}
                       </p>
                       <p className="font-body text-xs text-muted-foreground">
                         {avatar
                           ? `${avatar.gender === "female" ? "Female" : "Male"} · Size ${avatar.body_size} · saved to your account`
-                          : "Saved once and reused on every visit."}
+                          : "Upload one photo, set your height & size — saved for every visit."}
                       </p>
                     </div>
                   </div>
                 </button>
               </div>
             ) : mode === "avatar" ? (
-              /* Step 1b — 3D avatar try-on */
+              /* Step 1b — saved avatar try-on */
               <div className="space-y-4">
                 <button
                   onClick={() => setMode(null)}
@@ -355,9 +356,9 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
                   <p className="font-body text-sm text-muted-foreground py-6 text-center">Loading your avatar…</p>
                 ) : !user ? (
                   <p className="font-body text-sm text-muted-foreground py-6 text-center">
-                    Sign in to create and save a 3D avatar.
+                    Sign in to create and save your personal avatar.
                   </p>
-                ) : avatar ? (
+                ) : avatar && !rebuild ? (
                   <>
                     {tryOnImage ? (
                       <div className="rounded-2xl overflow-hidden border border-border bg-muted">
