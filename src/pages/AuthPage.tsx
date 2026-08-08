@@ -293,7 +293,7 @@ export default function AuthPage() {
   const getSubtitle = () => {
     if (step === "phone_otp") return `Enter the 6-digit code sent to ${formatPhone(phone)}`;
     if (step === "forgot_otp") return `Enter the code sent to ${formatPhone(phone)}`;
-    if (step === "email_otp") return "We sent a verification link to your email. Check your inbox.";
+    if (step === "email_otp") return "Confirm your email before signing in — we sent you a verification link.";
     if (step === "create_account") return "Complete your profile";
     if (step === "new_password") return "Choose a new password";
     if (mode === "forgot_password") return `Enter your ${method === "email" ? "email" : "phone"} to reset password`;
@@ -465,6 +465,28 @@ export default function AuthPage() {
                   )}
                 </form>
               )}
+
+              {/* Google OAuth */}
+              <div className="flex items-center gap-3 my-5">
+                <span className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted-foreground">or</span>
+                <span className="h-px flex-1 bg-border" />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogle}
+                disabled={loading}
+                className="w-full h-12 rounded-xl text-base font-medium"
+              >
+                <svg className="w-5 h-5 mr-2" viewBox="0 0 48 48" aria-hidden="true">
+                  <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6.1C12.3 13.2 17.6 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.5 24.5c0-1.6-.2-3.2-.5-4.7H24v9.1h12.6c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7.1-10.2 7.1-17.5z"/>
+                  <path fill="#FBBC05" d="M10.4 28.7A14.7 14.7 0 0 1 9.6 24c0-1.6.3-3.2.8-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.8-6.1z"/>
+                  <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.8-5.9l-7.6-5.9c-2.1 1.4-4.9 2.3-8.2 2.3-6.4 0-11.7-3.7-13.6-9l-7.8 6.1C6.5 42.6 14.6 48 24 48z"/>
+                </svg>
+                Continue with Google
+              </Button>
 
               {/* Toggle Login / Signup */}
               <div className="mt-6 text-center text-sm text-muted-foreground">
