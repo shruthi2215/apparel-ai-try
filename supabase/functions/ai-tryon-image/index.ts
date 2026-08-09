@@ -13,26 +13,43 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const imageDataUrl = userImageBase64.startsWith("data:")
-      ? userImageBase64
-      : `data:${userPhotoMimeType || "image/jpeg"};base64,${userImageBase64}`;
+    if (!userImageBase64 || typeof userImageBase64 !== "string") {
+      throw new Error("userImageBase64 is required");
+    }
+
+    async function toDataUrl(url: string): Promise<string | null> {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) return null;
+        const buf = new Uint8Array(await r.arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]);
+        const mime = r.headers.get("content-type") || "image/jpeg";
+        return `data:${mime};base64,${btoa(bin)}`;
+      } catch {
+        return null;
+      }
+    }
+
+    let imageDataUrl: string;
+    if (userImageBase64.startsWith("data:")) {
+      imageDataUrl = userImageBase64;
+    } else if (/^https?:\/\//i.test(userImageBase64)) {
+      // Saved avatar / remote image: download and inline it as base64
+      const fetched = await toDataUrl(userImageBase64);
+      if (!fetched) throw new Error("Could not load your avatar image. Please rebuild your avatar and try again.");
+      imageDataUrl = fetched;
+    } else {
+      imageDataUrl = `data:${userPhotoMimeType || "image/jpeg"};base64,${userImageBase64}`;
+    }
 
     // Fetch product image and convert to base64 data URL so the model receives it as a hard visual reference
     let productImageDataUrl: string | null = null;
     if (productImageUrl) {
-      try {
-        const r = await fetch(productImageUrl);
-        if (r.ok) {
-          const buf = new Uint8Array(await r.arrayBuffer());
-          let bin = "";
-          for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]);
-          const b64 = btoa(bin);
-          const mime = r.headers.get("content-type") || "image/jpeg";
-          productImageDataUrl = `data:${mime};base64,${b64}`;
-        }
-      } catch (e) {
-        console.error("Failed to fetch product image:", e);
-      }
+      productImageDataUrl = String(productImageUrl).startsWith("data:")
+        ? String(productImageUrl)
+        : await toDataUrl(String(productImageUrl));
+      if (!productImageDataUrl) console.error("Failed to fetch product image:", productImageUrl);
     }
 
     const colorNote = selectedColor ? ` (color variant: ${selectedColor})` : "";
