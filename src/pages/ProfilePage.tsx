@@ -8,8 +8,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {
   User, Heart, Clock, Package, Settings, LogOut,
-  Camera, Edit3, Check, X, Lock, Eye, EyeOff
+  Camera, Edit3, Check, X, Lock, Eye, EyeOff, AlertTriangle, Trash2
 } from "lucide-react";
+
 import { useToast } from "@/hooks/use-toast";
 
 const TABS = [
