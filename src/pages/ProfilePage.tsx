@@ -38,6 +38,30 @@ export default function ProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-account");
+      if (error) throw error;
+      if ((data as { error?: string })?.error) throw new Error((data as { error: string }).error);
+      toast({ title: "Account deleted", description: "Your account and data were permanently removed." });
+      await signOut();
+      navigate("/");
+    } catch (err) {
+      toast({
+        title: "Couldn't delete account",
+        description: err instanceof Error ? err.message : "Please try again or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
