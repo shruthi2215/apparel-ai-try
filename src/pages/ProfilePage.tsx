@@ -341,8 +341,59 @@ export default function ProfilePage() {
                   <Lock className="w-4 h-4 mr-2" /> {changingPassword ? "Updating…" : "Update Password"}
                 </Button>
               </div>
+
+              {/* Danger zone */}
+              <div className="mt-10 pt-6 border-t border-destructive/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
+                  <h3 className="font-display text-lg font-bold text-foreground">Delete account</h3>
+                </div>
+                <p className="font-body text-sm text-muted-foreground mb-4">
+                  Permanently delete your account, avatar, photos, try-on history, wishlist and cart.
+                  This cannot be undone.
+                </p>
+
+                {!confirmDelete ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setConfirmDelete(true)}
+                    className="rounded-xl border-destructive/40 text-destructive font-body"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" /> Delete my account
+                  </Button>
+                ) : (
+                  <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+                    <p className="font-body text-sm text-foreground">
+                      Type <span className="font-semibold">DELETE</span> to confirm.
+                    </p>
+                    <Input
+                      value={deleteConfirmText}
+                      onChange={(e) => setDeleteConfirmText(e.target.value)}
+                      placeholder="DELETE"
+                      className="bg-white/5 border-white/10 rounded-xl h-11"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={deleteAccount}
+                        disabled={deleting || deleteConfirmText !== "DELETE"}
+                        className="rounded-xl bg-destructive text-destructive-foreground font-body"
+                      >
+                        {deleting ? "Deleting…" : "Permanently delete"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => { setConfirmDelete(false); setDeleteConfirmText(""); }}
+                        className="rounded-xl font-body"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
+
         </div>
       </div>
       <Footer />
