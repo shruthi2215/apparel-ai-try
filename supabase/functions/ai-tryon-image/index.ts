@@ -1,4 +1,29 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { decode, Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
+
+/** Downscale a data URL to at most `maxDim` px and re-encode as JPEG to stay under the model's token limit. */
+async function shrinkDataUrl(dataUrl: string, maxDim = 768): Promise<string> {
+  try {
+    const b64 = dataUrl.split(",")[1] ?? "";
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const decoded = await decode(bytes);
+    const img = decoded as Image;
+    if (img.width > maxDim || img.height > maxDim) {
+      if (img.width >= img.height) img.resize(maxDim, Image.RESIZE_AUTO);
+      else img.resize(Image.RESIZE_AUTO, maxDim);
+    }
+    const out = await img.encodeJPEG(80);
+    let outBin = "";
+    for (let i = 0; i < out.length; i++) outBin += String.fromCharCode(out[i]);
+    return `data:image/jpeg;base64,${btoa(outBin)}`;
+  } catch (e) {
+    console.error("shrinkDataUrl failed, using original:", e);
+    return dataUrl;
+  }
+}
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
