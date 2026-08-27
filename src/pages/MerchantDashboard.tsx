@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import {
   Activity, Plus, Copy, Check, Trash2, KeyRound, Globe, BarChart3,
   CheckCircle2, XCircle, Clock, Webhook, CreditCard, Code2, Sparkles, ShieldCheck,
-  RefreshCw, Users, Settings, AlertTriangle, Hourglass, Ban,
+  RefreshCw, Users, Settings, Boxes, AlertTriangle, Hourglass, Ban,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/sonner";
 import TeamTab from "@/components/merchant/TeamTab";
 import BillingTab from "@/components/merchant/BillingTab";
 import SettingsTab from "@/components/merchant/SettingsTab";
+import CatalogTab from "@/components/merchant/CatalogTab";
 
 interface Merchant { id: string; name: string; website_url: string | null; status: string; created_at: string; plan_id: string | null; monthly_quota: number | null; rate_limit_per_min: number | null; contact_email: string | null; }
 interface ApiKey { id: string; name: string | null; key_prefix: string; revoked: boolean; last_used_at: string | null; created_at: string; }
@@ -254,6 +255,7 @@ export default function MerchantDashboard() {
 
         <Tabs defaultValue="billing">
           <TabsList className="flex-wrap h-auto">
+            <TabsTrigger value="catalog"><Boxes className="w-4 h-4 mr-1" />Catalog</TabsTrigger>
             <TabsTrigger value="analytics"><BarChart3 className="w-4 h-4 mr-1" />Analytics</TabsTrigger>
             <TabsTrigger value="keys"><KeyRound className="w-4 h-4 mr-1" />API Keys</TabsTrigger>
             <TabsTrigger value="install"><Code2 className="w-4 h-4 mr-1" />Install</TabsTrigger>
@@ -262,6 +264,10 @@ export default function MerchantDashboard() {
             <TabsTrigger value="billing"><CreditCard className="w-4 h-4 mr-1" />Billing</TabsTrigger>
             <TabsTrigger value="settings"><Settings className="w-4 h-4 mr-1" />Settings</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="catalog" className="mt-4">
+            <CatalogTab merchantId={merchant.id} />
+          </TabsContent>
 
           {/* Analytics */}
           <TabsContent value="analytics" className="space-y-4 mt-4">
