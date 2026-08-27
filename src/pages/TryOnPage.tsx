@@ -13,6 +13,7 @@ import {
   Zap, Shield, Eye, RotateCcw, Trash2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { imageForAi } from "@/lib/imageForAi";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AIAnalysis {
@@ -298,9 +299,12 @@ export default function TryOnPage() {
 
   // ── AI Generation ─────────────────────────────────────────────────────────
   const generateTryOnImageFor = async (product: typeof SAMPLE_PRODUCTS[0], color: string): Promise<string> => {
+    const preparedImage = await imageForAi(userPhoto as string);
     const { data, error } = await supabase.functions.invoke("ai-tryon-image", {
       body: {
-        userImageBase64: userPhoto,
+        userImageBase64: preparedImage,
+        productImageUrl: product.image_url,
+        productCategory: product.category,
         productName: product.name,
         selectedColor: color,
         userPhotoMimeType: userPhotoFile?.type || "image/jpeg",

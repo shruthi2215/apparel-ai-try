@@ -1,11 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { decode, Image } from "https://deno.land/x/imagescript@1.2.17/mod.ts";
 
-/** Downscale a data URL to at most `maxDim` px and re-encode as JPEG to stay under the model's token limit. */
+class ImageInputError extends Error {}
+
+/** Downscale a JPEG/PNG data URL and re-encode it to stay under the model's token limit. */
 async function shrinkDataUrl(dataUrl: string, maxDim = 768): Promise<string> {
   try {
-    const b64 = dataUrl.split(",")[1] ?? "";
+    const match = dataUrl.match(/^data:(image\/(?:jpeg|png));base64,([A-Za-z0-9+/=\s]+)$/i);
+    if (!match) throw new ImageInputError("Unsupported image format. Please use a JPG or PNG image.");
+    const b64 = match[2].replace(/\s/g, "");
+    if (!b64) throw new ImageInputError("The image is empty. Please choose another image.");
     const bin = atob(b64);
+    if (bin.length > 12 * 1024 * 1024) throw new ImageInputError("The image is too large. Please use an image under 12 MB.");
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     const decoded = await decode(bytes);
@@ -14,13 +20,14 @@ async function shrinkDataUrl(dataUrl: string, maxDim = 768): Promise<string> {
       if (img.width >= img.height) img.resize(maxDim, Image.RESIZE_AUTO);
       else img.resize(Image.RESIZE_AUTO, maxDim);
     }
-    const out = await img.encodeJPEG(80);
+    const out = await img.encodeJPEG(72);
     let outBin = "";
     for (let i = 0; i < out.length; i++) outBin += String.fromCharCode(out[i]);
     return `data:image/jpeg;base64,${btoa(outBin)}`;
-  } catch (e) {
-    console.error("shrinkDataUrl failed, using original:", e);
-    return dataUrl;
+  } catch (error) {
+    if (error instanceof ImageInputError) throw error;
+    console.error("Image decoding failed:", error);
+    throw new ImageInputError("This image could not be processed. Please upload a clear JPG or PNG image.");
   }
 }
 
@@ -46,10 +53,14 @@ serve(async (req) => {
       try {
         const r = await fetch(url);
         if (!r.ok) return null;
+        const contentLength = Number(r.headers.get("content-length") || 0);
+        if (contentLength > 12 * 1024 * 1024) return null;
         const buf = new Uint8Array(await r.arrayBuffer());
+        if (!buf.length || buf.length > 12 * 1024 * 1024) return null;
         let bin = "";
         for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]);
-        const mime = r.headers.get("content-type") || "image/jpeg";
+        const mime = (r.headers.get("content-type") || "image/jpeg").split(";")[0].toLowerCase();
+        if (!mime.startsWith("image/")) return null;
         return `data:${mime};base64,${btoa(bin)}`;
       } catch {
         return null;
@@ -78,8 +89,8 @@ serve(async (req) => {
     }
 
     // Keep total input under the model's 131k-token limit
-    imageDataUrl = await shrinkDataUrl(imageDataUrl, 768);
-    if (productImageDataUrl) productImageDataUrl = await shrinkDataUrl(productImageDataUrl, 640);
+    imageDataUrl = await shrinkDataUrl(imageDataUrl, 640);
+    if (productImageDataUrl) productImageDataUrl = await shrinkDataUrl(productImageDataUrl, 512);
 
 
 
@@ -178,7 +189,22 @@ SUCCESS CONDITION: The user must be able to say — "This is the EXACT same dres
       }
       const errText = await response.text();
       console.error("AI gateway error:", response.status, errText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      let gatewayMessage = "The AI service rejected this request. Please try different images.";
+      try {
+        const parsed = JSON.parse(errText);
+        const upstreamMessage = parsed?.error?.message;
+        if (typeof upstreamMessage === "string" && upstreamMessage.includes("token count exceeds")) {
+          gatewayMessage = "The images are too detailed to process together. Please use smaller JPG or PNG images.";
+        } else if (typeof upstreamMessage === "string") {
+          gatewayMessage = upstreamMessage;
+        }
+      } catch {
+        // Keep the safe fallback when the gateway body is not JSON.
+      }
+      return new Response(JSON.stringify({ error: gatewayMessage }), {
+        status: response.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const data = await response.json();
@@ -205,7 +231,8 @@ SUCCESS CONDITION: The user must be able to say — "This is the EXACT same dres
   } catch (err) {
     console.error("ai-tryon-image error:", err);
     return new Response(JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: err instanceof ImageInputError ? 400 : 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
