@@ -77,6 +77,12 @@ serve(async (req) => {
       if (!productImageDataUrl) console.error("Failed to fetch product image:", productImageUrl);
     }
 
+    // Keep total input under the model's 131k-token limit
+    imageDataUrl = await shrinkDataUrl(imageDataUrl, 768);
+    if (productImageDataUrl) productImageDataUrl = await shrinkDataUrl(productImageDataUrl, 640);
+
+
+
     const colorNote = selectedColor ? ` (color variant: ${selectedColor})` : "";
 
     const prompt = `OBJECTIVE: Perform STRICT GARMENT TRANSFER from IMAGE 2 (product) onto IMAGE 1 (user) with PIXEL-LEVEL FIDELITY. This is NOT text-to-image generation. The garment must remain IDENTICAL to IMAGE 2.
