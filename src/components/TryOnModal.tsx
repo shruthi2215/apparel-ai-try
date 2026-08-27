@@ -14,6 +14,7 @@ import { useAvatar } from "@/hooks/useAvatar";
 import AvatarPortrait from "@/components/avatar/AvatarPortrait";
 import AvatarBuilder from "@/components/avatar/AvatarBuilder";
 import { BODY_SIZES, type BodySize, type FaceAnalysis, type Gender } from "@/lib/avatar";
+import { imageForAi } from "@/lib/imageForAi";
 
 interface TryOnModalProps {
   open: boolean;
@@ -220,9 +221,10 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
     });
 
     try {
+      const preparedImage = await imageForAi(baseImage);
       const { data, error } = await supabase.functions.invoke("ai-tryon-image", {
         body: {
-          userImageBase64: baseImage,
+          userImageBase64: preparedImage,
           productName: product.name,
           productImageUrl: product.image_url,
           productCategory: product.category,
@@ -232,7 +234,13 @@ export default function TryOnModal({ open, onClose, product }: TryOnModalProps) 
       });
 
       if (error) {
-        const message = error?.message || "Try-on failed";
+        let message = error?.message || "Try-on failed";
+        try {
+          const body = await error.context?.json();
+          if (body?.error) message = body.error;
+        } catch {
+          // Keep the SDK error when the response has no JSON body.
+        }
         track({
           event_type: "tryon_failed", product_id: product.id, product_name: product.name,
           category: product.category, color: useColor, status: "error",
